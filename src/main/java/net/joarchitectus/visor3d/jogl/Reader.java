@@ -79,7 +79,7 @@ public class Reader {
                 // Read the elements. They all share the same type.
                 Element element = reader.readElement();
                 while (element != null) {
-                    System.out.println(vertex_counter+" :> "+element.toString());
+                    //System.out.println(vertex_counter+" :> "+element.toString());
                     // Use the the 'get' methods to access the properties.
                     // jPly automatically converts the various data types supported
                     // by PLY for you.
@@ -102,7 +102,7 @@ public class Reader {
                 // Read the elements. They all share the same type.
                 Element element = reader.readElement();
                 while (element != null) {
-                    System.out.println(face_counter+" :> "+element.toString());
+                    //System.out.println(face_counter+" :> "+element.toString());
                     int[] indices = element.getIntList("vertex_indices");
 
                     // Create a face from the split line, finding the vertices needed for the face
