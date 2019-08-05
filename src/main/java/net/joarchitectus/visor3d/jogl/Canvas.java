@@ -334,9 +334,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
             
             // Read in the values
             //values = new Reader("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply");
-            values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/horse.ply")));
+            //values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/horse.ply")));
             //values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply")));
-            //values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply")));
+            values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply")));
         } catch(IOException ie) {
             ie.printStackTrace();
         }
@@ -346,7 +346,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         glu = new GLU();
 
         // Clear background colour and depth
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gl.glClearColor(0.1f, 0.1f, 0.2f, 0.0f);
         gl.glClearDepth(1.0f);
 
         // Depth testing, perspective and smooth shading
@@ -474,31 +474,35 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glRotatef(rt_y, 0, 1, 0);
         gl.glRotatef(rt_z, 0, 0, 1);
 
+        
         // Begin triangle rendering
-        gl.glBegin(GL_TRIANGLES);
+        gl.glBegin(GL_POINTS);
 
         // Loop over faces, rendering each vertex for each face
         for (int i = 0; i < values.face_list.length; i++) {
             // Set the normal for a vertex and then make the vertex
-            gl.glNormal3f(values.face_list[i].vertex_list[0].normal.x,
-                    values.face_list[i].vertex_list[0].normal.y,
-                    values.face_list[i].vertex_list[0].normal.z);
+//            gl.glColor3f( 1f,0f,0f ); //applying red  
+//            gl.glNormal3f(values.face_list[i].vertex_list[0].normal.x,
+//                    values.face_list[i].vertex_list[0].normal.y,
+//                    values.face_list[i].vertex_list[0].normal.z);
             gl.glVertex3f(values.face_list[i].vertex_list[0].x,
                     values.face_list[i].vertex_list[0].y,
                     values.face_list[i].vertex_list[0].z);
 
             // And again
-            gl.glNormal3f(values.face_list[i].vertex_list[1].normal.x,
-                    values.face_list[i].vertex_list[1].normal.y,
-                    values.face_list[i].vertex_list[1].normal.z);
+//            gl.glColor3f( 1f,0f,0f ); //applying red  
+//            gl.glNormal3f(values.face_list[i].vertex_list[1].normal.x,
+//                    values.face_list[i].vertex_list[1].normal.y,
+//                    values.face_list[i].vertex_list[1].normal.z);
             gl.glVertex3f(values.face_list[i].vertex_list[1].x,
                     values.face_list[i].vertex_list[1].y,
                     values.face_list[i].vertex_list[1].z);
 
             // Third time's the charm
-            gl.glNormal3f(values.face_list[i].vertex_list[2].normal.x,
-                    values.face_list[i].vertex_list[2].normal.y,
-                    values.face_list[i].vertex_list[2].normal.z);
+//            gl.glColor3f( 1f,0f,0f ); //applying red  
+//            gl.glNormal3f(values.face_list[i].vertex_list[2].normal.x,
+//                    values.face_list[i].vertex_list[2].normal.y,
+//                    values.face_list[i].vertex_list[2].normal.z);
             gl.glVertex3f(values.face_list[i].vertex_list[2].x,
                     values.face_list[i].vertex_list[2].y,
                     values.face_list[i].vertex_list[2].z);
