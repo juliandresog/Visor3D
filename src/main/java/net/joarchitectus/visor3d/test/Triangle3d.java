@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.joarchitectus.visor3d;
+package net.joarchitectus.visor3d.test;
 
 import javax.swing.JFrame;
 import com.jogamp.opengl.*;  // new jogl - 3.0b7

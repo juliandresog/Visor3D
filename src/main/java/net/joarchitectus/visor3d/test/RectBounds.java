@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
  */
-package net.joarchitectus.visor3d;
+package net.joarchitectus.visor3d.test;
 
 /**
  * Three-dimensional, axis-oriented rectangular bounds.

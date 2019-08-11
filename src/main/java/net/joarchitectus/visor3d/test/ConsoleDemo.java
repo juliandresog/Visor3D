@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.joarchitectus.visor3d;
+package net.joarchitectus.visor3d.test;
 
 import java.io.File;
 import java.io.IOException;

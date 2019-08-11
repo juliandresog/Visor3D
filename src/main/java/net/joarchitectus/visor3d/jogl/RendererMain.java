@@ -27,7 +27,7 @@ public class RendererMain extends JFrame {
     /**
      * Window title.
      */
-    private static String TITLE = "Bunny Renderer";
+    private static String TITLE = "3D Renderer";
 
     /**
      * Default width of the rendered window.

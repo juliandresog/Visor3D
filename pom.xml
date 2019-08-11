@@ -35,7 +35,7 @@
             <version>0.2.0</version>
         </dependency>        
 
-        <dependency>
+        <!--dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
             <version>${lwjgl.version}</version>
@@ -394,7 +394,7 @@
             <artifactId>lwjgl-zstd</artifactId>
             <version>${lwjgl.version}</version>
             <classifier>${lwjgl.natives}</classifier>
-        </dependency>
+        </dependency-->
         
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
@@ -405,6 +405,12 @@
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all-main</artifactId>
             <version>2.3.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jengineering</groupId>
+            <artifactId>sjmply</artifactId>
+            <version>1.0.1-ALPHA</version>
         </dependency>
  
     </dependencies>
@@ -454,4 +460,13 @@
             </plugin>
         </plugins>
     </build>
+    
+    <repositories>
+        <!--other repositories if any-->
+        <repository>
+            <id>project.local</id>
+            <name>project</name>
+            <url>file:${project.basedir}/repo</url>
+        </repository>
+    </repositories>
 </project>

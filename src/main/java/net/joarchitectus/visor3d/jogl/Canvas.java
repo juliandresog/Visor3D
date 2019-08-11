@@ -18,16 +18,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import static com.jogamp.opengl.GL.*;  // GL constants
+//import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
+import com.jogamp.opengl.GLCapabilities;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.smurn.jply.PlyReaderFile;
 
 /**
- * Based on :http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html with minor modifications
- * JOGL 2.0 Program Template (GLCanvas)
- * This is a "Component" which can be added into a top-level "Container".
- * It also handles the OpenGL events to render graphics.
+ * Based on :http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
+ * with minor modifications JOGL 2.0 Program Template (GLCanvas) This is a
+ * "Component" which can be added into a top-level "Container". It also handles
+ * the OpenGL events to render graphics.
  *
  * @author Curtis White
  * @version 1.0
@@ -40,6 +43,29 @@ public class Canvas extends GLCanvas implements GLEventListener {
      * The main GL Utility
      */
     private GLU glu;
+    private String archivo;
+
+    /**
+     * Constructor to setup the GUI for this Component
+     *
+     * @param capabilities
+     */
+    public Canvas(GLCapabilities capabilities) {
+        super(capabilities);
+        this.addGLEventListener(this);
+    }
+
+    /**
+     * Constructor to setup the GUI for this Component
+     *
+     * @param capabilities
+     * @param archivo
+     */
+    public Canvas(GLCapabilities capabilities, String archivo) {
+        super(capabilities);
+        this.addGLEventListener(this);
+        this.archivo = archivo;
+    }
 
     /**
      * Constructor to setup the GUI for this Component
@@ -109,12 +135,11 @@ public class Canvas extends GLCanvas implements GLEventListener {
     GL2 gl;
 
     // ------ Implement methods declared in GLEventListener ------
-
     /**
      * Overridden method from the one declared in GLEventListener.
      * <p>
-     * init() runs on the creation of the canvas, this is where we can declare mouse and key listeners
-     * and other control methods.
+     * init() runs on the creation of the canvas, this is where we can declare
+     * mouse and key listeners and other control methods.
      *
      * @author Curtis White
      * @since 1.0
@@ -145,11 +170,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
             /**
              * Overridden method from the one declared in MouseMotionListener.
              * <p>
-             * mouseDragged() runs when the mouse moves while a mouse button is held
+             * mouseDragged() runs when the mouse moves while a mouse button is
+             * held
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A MouseEvent that details when, where and how the mouse was moved/clicked
+             * @param e A MouseEvent that details when, where and how the mouse
+             * was moved/clicked
              */
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -173,8 +200,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     int y = e.getY();
 
                     // Translate for RMB
-                    tr_x -= ((float)old_x - (float)x) / 1000;
-                    tr_y += ((float)old_y - (float)y) / 1000;
+                    tr_x -= ((float) old_x - (float) x) / 1000;
+                    tr_y += ((float) old_y - (float) y) / 1000;
 
                     // Overwrite last frame data
                     old_x = x;
@@ -185,11 +212,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
             /**
              * Overridden method from the one declared in MouseMotionListener.
              * <p>
-             * mouseMoved() runs when the mouse moves when a mouse button is not held
+             * mouseMoved() runs when the mouse moves when a mouse button is not
+             * held
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A MouseEvent that details when, where and how the mouse was moved/clicked
+             * @param e A MouseEvent that details when, where and how the mouse
+             * was moved/clicked
              */
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -214,11 +243,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
             /**
              * Overridden method from the one declared in MouseWheelListener.
              * <p>
-             * mouseMoved() runs when the mouse moves when a mouse button is not held
+             * mouseMoved() runs when the mouse moves when a mouse button is not
+             * held
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A MouseWheelEvent that details when, where and how the mouse wheel moved
+             * @param e A MouseWheelEvent that details when, where and how the
+             * mouse wheel moved
              */
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
@@ -247,7 +278,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A KeyEvent that details when, where and how key was pressed/released/typed.
+             * @param e A KeyEvent that details when, where and how key was
+             * pressed/released/typed.
              */
             @Override
             public void keyTyped(KeyEvent e) {
@@ -257,12 +289,14 @@ public class Canvas extends GLCanvas implements GLEventListener {
             /**
              * Overridden method from the one declared in KeyListener.
              * <p>
-             * keyPressed() runs on key down of any key. The key pressed can be found in e. This method is used over
-             * others for faster looping and response time.
+             * keyPressed() runs on key down of any key. The key pressed can be
+             * found in e. This method is used over others for faster looping
+             * and response time.
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A KeyEvent that details when, where and how key was pressed/released/typed.
+             * @param e A KeyEvent that details when, where and how key was
+             * pressed/released/typed.
              */
             @Override
             public void keyPressed(KeyEvent e) {
@@ -318,7 +352,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
              *
              * @author Curtis White
              * @since 1.0
-             * @param e A KeyEvent that details when, where and how key was pressed/released/typed.
+             * @param e A KeyEvent that details when, where and how key was
+             * pressed/released/typed.
              */
             @Override
             public void keyReleased(KeyEvent e) {
@@ -329,15 +364,15 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
         // Try/Catch to find and handle IOExceptions
         try {
-            //File file = new File("/media/DATOS/Universidad/Proyectos/Armadillo.ply");
-            //System.out.println("Existe: "+file.exists());
-            
-            // Read in the values
-            //values = new Reader("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply");
-            //values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/horse.ply")));
-            //values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply")));
-            values = new Reader(new PlyReaderFile(new File("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply")));
-        } catch(IOException ie) {
+             if (archivo == null || archivo.isEmpty()) {
+                 values = new Reader();
+                //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply"));
+                //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/horse.ply"));
+                //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply"));
+            } else {
+                values = new Reader(Paths.get(archivo));
+            }
+        } catch (IOException ie) {
             ie.printStackTrace();
         }
 
@@ -360,8 +395,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
     /**
      * Overridden method from the one declared in GLEventListener.
      * <p>
-     * reshape() runs on the resizing of the canvas, this is where we adjust variables to be
-     * compatible with the new window size.
+     * reshape() runs on the resizing of the canvas, this is where we adjust
+     * variables to be compatible with the new window size.
      *
      * @author Curtis White
      * @since 1.0
@@ -373,8 +408,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl = drawable.getGL().getGL2();
 
         // Prevent zero height to stop divide by zero errors
-        if (height == 0) height = 1;
-        float aspect = (float)width / height;
+        if (height == 0) {
+            height = 1;
+        }
+        float aspect = (float) width / height;
 
         // Set the view port (display area) to cover the entire window
         gl.glViewport(0, 0, width, height);
@@ -434,11 +471,11 @@ public class Canvas extends GLCanvas implements GLEventListener {
         float[] specular;
 
         // Use values based on selected material
-        if (material%3 == 0) {
+        if (material % 3 == 0) {
             ambient = new float[]{0.96f, 0.96f, 0.96f, 1.0f};
             diffuse = new float[]{0.96f, 0.96f, 0.96f, 1.0f};
             specular = new float[]{0.96f, 0.96f, 0.96f, 1.0f};
-        } else if (material%3 == 1) {
+        } else if (material % 3 == 1) {
             ambient = new float[]{1.0f, 0.843f, 0, 1.0f};
             diffuse = new float[]{1.0f, 0.843f, 0, 1.0f};
             specular = new float[]{1.0f, 0.843f, 0, 1.0f};
@@ -464,7 +501,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glLightfv(GL_LIGHT0, GL_SPECULAR, fb);
 
         // Settings for the ambient lighting
-        fb.put(new float[] {0.3f, 0.3f, 0.3f, 1.0f});
+        fb.put(new float[]{0.3f, 0.3f, 0.3f, 1.0f});
         fb.position(0);
         gl.glEnable(GL_LIGHTING);
         gl.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fb);
@@ -474,7 +511,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         gl.glRotatef(rt_y, 0, 1, 0);
         gl.glRotatef(rt_z, 0, 0, 1);
 
-        
+        //gl.glColor3f( 1f,0f,0f ); //applying red  
         // Begin triangle rendering
         gl.glBegin(GL_POINTS);
 
@@ -508,6 +545,15 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     values.face_list[i].vertex_list[2].z);
         }
 
+        if (values.face_list.length == 0) {
+            for (int i = 0; i < values.vertex_list.length; i++) {
+                gl.glColor3f(1f, 0f, 0f); //applying red  
+                gl.glVertex3f(values.vertex_list[i].x,
+                        values.vertex_list[i].y,
+                        values.vertex_list[i].z);
+            }
+        }
+
         // End rendering
         gl.glEnd();
         gl.glLoadIdentity();
@@ -521,5 +567,16 @@ public class Canvas extends GLCanvas implements GLEventListener {
      * @param drawable A GLAutoDrawable that calls the rendering functions
      */
     @Override
-    public void dispose(GLAutoDrawable drawable) { }
+    public void dispose(GLAutoDrawable drawable) {
+    }
+
+    public void cargarArchivo(String archivo) {
+        try {
+            values = new Reader(Paths.get(archivo));
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }
+
+        gl.glLoadIdentity();
+    }
 }
