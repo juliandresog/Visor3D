@@ -24,6 +24,8 @@ import com.jogamp.opengl.GLCapabilities;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import org.smurn.jply.PlyReaderFile;
 
 /**
@@ -53,6 +55,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
     public Canvas(GLCapabilities capabilities) {
         super(capabilities);
         this.addGLEventListener(this);
+        valuesB = new ArrayList<>();
     }
 
     /**
@@ -65,6 +68,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         super(capabilities);
         this.addGLEventListener(this);
         this.archivo = archivo;
+        valuesB = new ArrayList<>();
     }
 
     /**
@@ -72,12 +76,18 @@ public class Canvas extends GLCanvas implements GLEventListener {
      */
     public Canvas() {
         this.addGLEventListener(this);
+        valuesB = new ArrayList<>();
     }
 
     /**
      * Reader to fetch values from the file
      */
     private Reader values;
+
+    /**
+     * Reader to fetch values from the file
+     */
+    private List<Reader> valuesB;
 
     /**
      * Rotation value on the x axis
@@ -132,7 +142,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
     /**
      * OpenGL
      */
-    GL2 gl;
+    private GL2 gl;
 
     // ------ Implement methods declared in GLEventListener ------
     /**
@@ -364,9 +374,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
         // Try/Catch to find and handle IOExceptions
         try {
-             if (archivo == null || archivo.isEmpty()) {                 
-                 values = new Reader(
-                         Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()));
+            if (archivo == null || archivo.isEmpty()) {
+                values = new Reader(
+                        Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/horse.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply"));
@@ -555,6 +565,17 @@ public class Canvas extends GLCanvas implements GLEventListener {
             }
         }
 
+        if (valuesB != null && !valuesB.isEmpty()) {
+            for (Reader figura : valuesB) {
+                for (int i = 0; i < figura.vertex_list.length; i++) {
+                    gl.glColor3f(10f, 0f, 0f); //applying red  
+                    gl.glVertex3f(figura.vertex_list[i].x,
+                            figura.vertex_list[i].y,
+                            figura.vertex_list[i].z);
+                }
+            }
+        }
+
         // End rendering
         gl.glEnd();
         gl.glLoadIdentity();
@@ -577,6 +598,24 @@ public class Canvas extends GLCanvas implements GLEventListener {
         } catch (IOException ie) {
             ie.printStackTrace();
         }
+
+        gl.glLoadIdentity();
+    }
+
+    public void agregarArchivo(String archivo) {
+        try {
+            Reader nuevo = new Reader(Paths.get(archivo));
+            valuesB.add(nuevo);
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }
+
+        gl.glLoadIdentity();
+    }
+
+    public void limpiar() {
+        values = new Reader();
+        valuesB.clear();
 
         gl.glLoadIdentity();
     }

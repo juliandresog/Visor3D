@@ -100,10 +100,12 @@ public class MainJFrame extends javax.swing.JFrame {
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuAbrir = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Visor 3D PLY");
-        setPreferredSize(new java.awt.Dimension(820, 640));
+        setTitle("Visor 3D PLY - Julian A Osorio G");
+        setPreferredSize(new java.awt.Dimension(924, 700));
         setResizable(false);
 
         jMenu1.setText("Menu");
@@ -121,9 +123,27 @@ public class MainJFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuAbrir);
 
+        jMenuItem1.setText("Agregar");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Limpiar");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
         jMenuBarMain.add(jMenu1);
 
         setJMenuBar(jMenuBarMain);
+
+        getAccessibleContext().setAccessibleName("Visor 3D PLY - Julian A Osorio G");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -152,6 +172,28 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jMenuAbrirActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here: Agregar
+        jFileChooserPyl.setDialogTitle("Select a ply file");
+        jFileChooserPyl.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PLY file", "ply");
+        jFileChooserPyl.addChoosableFileFilter(filter);
+
+        int returnValue = jFileChooserPyl.showOpenDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            if (jFileChooserPyl.getSelectedFile().isDirectory()) {
+                System.out.println("You selected the directory: " + jFileChooserPyl.getSelectedFile());
+            } else {
+                ((Canvas) canvas).agregarArchivo(jFileChooserPyl.getSelectedFile().getPath());
+            }
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here: Limpiar
+        ((Canvas) canvas).limpiar();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -201,5 +243,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuAbrir;
     private javax.swing.JMenuBar jMenuBarMain;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     // End of variables declaration//GEN-END:variables
 }
