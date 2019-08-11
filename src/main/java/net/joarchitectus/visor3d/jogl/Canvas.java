@@ -364,8 +364,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
         // Try/Catch to find and handle IOExceptions
         try {
-             if (archivo == null || archivo.isEmpty()) {
-                 values = new Reader();
+             if (archivo == null || archivo.isEmpty()) {                 
+                 values = new Reader(
+                         Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/horse.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply"));
