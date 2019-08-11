@@ -568,7 +568,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         if (valuesB != null && !valuesB.isEmpty()) {
             for (Reader figura : valuesB) {
                 for (int i = 0; i < figura.vertex_list.length; i++) {
-                    gl.glColor3f(10f, 0f, 0f); //applying red  
+                    gl.glColor3f(1f, 0f, 0f); //applying red  
                     gl.glVertex3f(figura.vertex_list[i].x,
                             figura.vertex_list[i].y,
                             figura.vertex_list[i].z);
