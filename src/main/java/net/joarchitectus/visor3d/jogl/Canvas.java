@@ -26,6 +26,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Point3d;
+import net.joarchitectus.visor3d.icp.IterativeClosestPoint;
+import net.joarchitectus.visor3d.icp.ListenerAvance;
+import org.slf4j.LoggerFactory;
 import org.smurn.jply.PlyReaderFile;
 
 /**
@@ -40,6 +45,8 @@ import org.smurn.jply.PlyReaderFile;
  */
 @SuppressWarnings("serial")
 public class Canvas extends GLCanvas implements GLEventListener {
+
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(Canvas.class);
 
     /**
      * The main GL Utility
@@ -88,6 +95,11 @@ public class Canvas extends GLCanvas implements GLEventListener {
      * Reader to fetch values from the file
      */
     private List<Reader> valuesB;
+
+    /**
+     * Resultado de ICP clasico
+     */
+    private List<Point3d> resultadoICPClasico;
 
     /**
      * Rotation value on the x axis
@@ -576,6 +588,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
             }
         }
 
+        if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty()) {
+            for (Point3d point3d : resultadoICPClasico) {
+                gl.glColor3d(1d, 1d, 0d); //applying ?  
+                gl.glVertex3d(point3d.getX(), point3d.getY(), point3d.getZ());
+            }
+        }
+
         // End rendering
         gl.glEnd();
         gl.glLoadIdentity();
@@ -618,5 +637,56 @@ public class Canvas extends GLCanvas implements GLEventListener {
         valuesB.clear();
 
         gl.glLoadIdentity();
+    }
+
+    /**
+     *
+     * @param swingWorker
+     */
+    public void ejecutarICP(final ListenerAvance listener) {
+        if (valuesB != null && !valuesB.isEmpty() && valuesB.size() == 2) {
+            double[][] pointSet1 = new double[valuesB.get(0).vertex_list.length][3];
+            double[][] pointSet2 = new double[valuesB.get(1).vertex_list.length][3];
+
+            for (int i = 0; i < valuesB.get(0).vertex_list.length; i++) {
+                pointSet1[i][0] = valuesB.get(0).vertex_list[i].x;
+                pointSet1[i][1] = valuesB.get(0).vertex_list[i].y;
+                pointSet1[i][2] = valuesB.get(0).vertex_list[i].z;
+            }
+
+            for (int i = 0; i < valuesB.get(1).vertex_list.length; i++) {
+                pointSet2[i][0] = valuesB.get(1).vertex_list[i].x;
+                pointSet2[i][1] = valuesB.get(1).vertex_list[i].y;
+                pointSet2[i][2] = valuesB.get(1).vertex_list[i].z;
+            }
+
+            IterativeClosestPoint.setDebugLevel(1);
+            Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, listener);
+
+            //System.out.println("A: " + matrix4d.toString());
+            if (resultadoICPClasico == null) {
+                resultadoICPClasico = new ArrayList<>();
+            } else {
+                resultadoICPClasico.clear();
+            }
+
+            for (int i = 0; i < valuesB.get(1).vertex_list.length; i++) {
+                resultadoICPClasico.add(transformPoint(matrix4d, new Point3d(
+                        valuesB.get(1).vertex_list[i].x,
+                        valuesB.get(1).vertex_list[i].y,
+                        valuesB.get(1).vertex_list[i].z
+                )));
+            }
+
+            log.warn("Termina algoritmo");
+            gl.glLoadIdentity();
+        }
+    }
+
+    // Returns the transformed point of the original point given a transform matrix
+    private static Point3d transformPoint(Matrix4d transformMat, Point3d originalPoint) {
+        Point3d tempPoint = new Point3d();
+        transformMat.transform(new Point3d(originalPoint.getX(), originalPoint.getY(), originalPoint.getZ()), tempPoint);
+        return tempPoint;
     }
 }

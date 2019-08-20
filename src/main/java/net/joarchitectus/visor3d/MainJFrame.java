@@ -12,16 +12,27 @@ import com.jogamp.opengl.util.FPSAnimator;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Matrix4d;
+import net.joarchitectus.visor3d.icp.ListenerAvance;
 import net.joarchitectus.visor3d.jogl.Canvas;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author josorio
  */
 public class MainJFrame extends javax.swing.JFrame {
+
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(MainJFrame.class);
 
     /**
      * Canvas for OpenGL to draw on.
@@ -97,16 +108,38 @@ public class MainJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jFileChooserPyl = new javax.swing.JFileChooser();
+        jToolBar1 = new javax.swing.JToolBar();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        barraProgreso = new javax.swing.JProgressBar();
+        labelEstado = new javax.swing.JLabel();
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuAbrir = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Visor 3D PLY - Julian A Osorio G");
         setPreferredSize(new java.awt.Dimension(924, 700));
         setResizable(false);
+
+        jToolBar1.setRollover(true);
+
+        jLabel2.setText("Julián Andrés Osorio G.");
+        jToolBar1.add(jLabel2);
+
+        getContentPane().add(jToolBar1, java.awt.BorderLayout.PAGE_START);
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(100, 100));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
+        jPanel1.add(barraProgreso);
+
+        labelEstado.setText("Progreso");
+        jPanel1.add(labelEstado);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.LINE_END);
 
         jMenu1.setText("Menu");
         jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -139,11 +172,17 @@ public class MainJFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem2);
 
+        jMenuItem3.setText("Ejecutar ICP");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+
         jMenuBarMain.add(jMenu1);
 
         setJMenuBar(jMenuBarMain);
-
-        getAccessibleContext().setAccessibleName("Visor 3D PLY - Julian A Osorio G");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -153,7 +192,7 @@ public class MainJFrame extends javax.swing.JFrame {
         //Abrir otro archivo
         //((Canvas)canvas).cargarArchivo("/media/DATOS/Universidad/Proyectos/horse.ply");
 
-        
+
     }//GEN-LAST:event_jMenu1MouseClicked
 
     private void jMenuAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAbrirActionPerformed
@@ -195,6 +234,30 @@ public class MainJFrame extends javax.swing.JFrame {
         ((Canvas) canvas).limpiar();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO Ejecutar ICP
+        log.warn("Ejecutando ICP...");
+        ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
+            @Override
+            public void avance(String text) {
+                labelEstado.setText(text);
+            }
+
+            @Override
+            public void avance(int iteracion) {
+                
+            }
+
+            @Override
+            public void matrixAvance(Matrix4d matrix4d, int iteracion) {
+                
+            }
+        });
+        //start the SwingWorker outside the EDT
+//        MySwingWorker worker = new MySwingWorker(barraProgreso, labelEstado);
+//        worker.execute();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -205,12 +268,19 @@ public class MainJFrame extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+            // Set cross-platform Java L&F (also called "Metal")
+//            UIManager.setLookAndFeel(
+//                    UIManager.getCrossPlatformLookAndFeelClassName());
+
+            // Set System L&F
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(MainJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -239,11 +309,74 @@ public class MainJFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JProgressBar barraProgreso;
     private javax.swing.JFileChooser jFileChooserPyl;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuAbrir;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel labelEstado;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Worker
+     */
+    private class MySwingWorker extends SwingWorker<String, Double> {
+
+        private final JProgressBar fProgressBar;
+        private final JLabel fLabel;
+
+        private MySwingWorker(JProgressBar aProgressBar, JLabel aLabel) {
+            fProgressBar = aProgressBar;
+            fLabel = aLabel;
+        }
+
+        @Override
+        protected String doInBackground() throws Exception {
+
+            ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
+                @Override
+                public void avance(String text) {
+
+                }
+
+                @Override
+                public void avance(int iteracion) {
+                    log.info("IT: " + iteracion);
+                    publish(new Double(iteracion));
+                }
+
+                @Override
+                public void matrixAvance(Matrix4d matrix4d, int iteracion) {
+
+                }
+
+            });
+            return "Finished";
+        }
+
+        @Override
+        protected void process(List<Double> aDoubles) {
+            log.info("IT_B: " + aDoubles);
+
+            //update the percentage of the progress bar that is done
+            int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
+            fProgressBar.setValue((int) (fProgressBar.getMinimum() + (amount * aDoubles.get(aDoubles.size() - 1))));
+        }
+
+        @Override
+        protected void done() {
+            try {
+                fLabel.setText(get());
+            } catch (Exception e) {
+                log.error("Error", e);
+            }
+        }
+    }
+
 }

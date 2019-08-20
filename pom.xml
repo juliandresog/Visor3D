@@ -12,6 +12,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <lwjgl.version>3.2.1</lwjgl.version>
         <lwjgl.natives>natives-linux</lwjgl.natives>
+        <version.slf4j>1.7.25</version.slf4j>
+        <version.log4j>2.9.0</version.log4j>
     </properties>
     
     <dependencies>
@@ -50,6 +52,40 @@
             <groupId>org.jengineering</groupId>
             <artifactId>sjmply</artifactId>
             <version>1.0.1-ALPHA</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.vecmath</groupId>
+            <artifactId>vecmath</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+        <!-- LOG4J v2s -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${version.log4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${version.log4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${version.log4j}</version>
         </dependency>
  
     </dependencies>
