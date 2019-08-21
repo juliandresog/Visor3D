@@ -149,7 +149,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
     /**
      * Flag whether the lights are on or off
      */
-    private boolean lights_on = true;
+    private boolean lights_on = false;
 
     /**
      * OpenGL
@@ -484,6 +484,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
         if (lights_on) {
             gl.glEnable(GL_LIGHT0);
             gl.glLightfv(GL_LIGHT0, GL_POSITION, fb);
+            gl.glColorMaterial(GL_FRONT, GL_DIFFUSE);
+            gl.glEnable(GL_COLOR_MATERIAL);
         } else {
             gl.glDisable(GL_LIGHT0);
         }
@@ -511,23 +513,23 @@ public class Canvas extends GLCanvas implements GLEventListener {
         // Ambient settings for GL_LIGHT0
         fb.put(ambient);
         fb.position(0);
-        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, fb);
+//        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, fb);
 
         // Diffuse settings for GL_LIGHT0
         fb.put(diffuse);
         fb.position(0);
-        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, fb);
+//        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, fb);
 
         // Specular settings for GL_LIGHT0
         fb.put(specular);
         fb.position(0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, fb);
+//        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, fb);
 
         // Settings for the ambient lighting
         fb.put(new float[]{0.3f, 0.3f, 0.3f, 1.0f});
         fb.position(0);
-        gl.glEnable(GL_LIGHTING);
-        gl.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fb);
+//        gl.glEnable(GL_LIGHTING);
+//        gl.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fb);
 
         // Rotate based on saved values
         gl.glRotatef(rt_x, 1, 0, 0);
@@ -541,7 +543,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         // Loop over faces, rendering each vertex for each face
         for (int i = 0; i < values.face_list.length; i++) {
             // Set the normal for a vertex and then make the vertex
-//            gl.glColor3f( 1f,0f,0f ); //applying red  
+            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying purpura  
 //            gl.glNormal3f(values.face_list[i].vertex_list[0].normal.x,
 //                    values.face_list[i].vertex_list[0].normal.y,
 //                    values.face_list[i].vertex_list[0].normal.z);
@@ -550,7 +552,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     values.face_list[i].vertex_list[0].z);
 
             // And again
-//            gl.glColor3f( 1f,0f,0f ); //applying red  
+            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying red  
 //            gl.glNormal3f(values.face_list[i].vertex_list[1].normal.x,
 //                    values.face_list[i].vertex_list[1].normal.y,
 //                    values.face_list[i].vertex_list[1].normal.z);
@@ -559,7 +561,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     values.face_list[i].vertex_list[1].z);
 
             // Third time's the charm
-//            gl.glColor3f( 1f,0f,0f ); //applying red  
+            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying red  
 //            gl.glNormal3f(values.face_list[i].vertex_list[2].normal.x,
 //                    values.face_list[i].vertex_list[2].normal.y,
 //                    values.face_list[i].vertex_list[2].normal.z);
@@ -567,6 +569,13 @@ public class Canvas extends GLCanvas implements GLEventListener {
                     values.face_list[i].vertex_list[2].y,
                     values.face_list[i].vertex_list[2].z);
         }
+
+        float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
+        float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
+        float[] d3f = {0.4f, 0.2f, 0.2f, 1.0f};
+        FloatBuffer d1 = FloatBuffer.wrap(d1f);
+        FloatBuffer d2 = FloatBuffer.wrap(d2f);
+        FloatBuffer d3 = FloatBuffer.wrap(d3f);
 
         if (values.face_list.length == 0) {
             for (int i = 0; i < values.vertex_list.length; i++) {
@@ -580,7 +589,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
         if (valuesB != null && !valuesB.isEmpty()) {
             for (Reader figura : valuesB) {
                 for (int i = 0; i < figura.vertex_list.length; i++) {
-                    gl.glColor3f(1f, 0f, 0f); //applying red  
+                    gl.glColor3f(0.0f, 0.99f, 0.0f); //applying red  
+//                    gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d2);
                     gl.glVertex3f(figura.vertex_list[i].x,
                             figura.vertex_list[i].y,
                             figura.vertex_list[i].z);
@@ -589,8 +599,10 @@ public class Canvas extends GLCanvas implements GLEventListener {
         }
 
         if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty()) {
+
             for (Point3d point3d : resultadoICPClasico) {
-                gl.glColor3d(1d, 1d, 0d); //applying ?  
+                gl.glColor3d(1.0f, 1.1f, 0.0f); //applying ?  
+//                gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d1);
                 gl.glVertex3d(point3d.getX(), point3d.getY(), point3d.getZ());
             }
         }

@@ -241,6 +241,8 @@ public class MainJFrame extends javax.swing.JFrame {
             @Override
             public void avance(String text) {
                 labelEstado.setText(text);
+                labelEstado.revalidate();
+                labelEstado.repaint();
             }
 
             @Override
@@ -347,7 +349,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
                 @Override
                 public void avance(int iteracion) {
-                    log.info("IT: " + iteracion);
+                    //log.info("IT: " + iteracion);
                     publish(new Double(iteracion));
                 }
 
@@ -362,8 +364,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         @Override
         protected void process(List<Double> aDoubles) {
-            log.info("IT_B: " + aDoubles);
-
+            //log.info("IT_B: " + aDoubles);
             //update the percentage of the progress bar that is done
             int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
             fProgressBar.setValue((int) (fProgressBar.getMinimum() + (amount * aDoubles.get(aDoubles.size() - 1))));
