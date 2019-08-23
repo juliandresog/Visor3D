@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 import net.joarchitectus.visor3d.icp.IterativeClosestPoint;
@@ -53,6 +54,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
      */
     private GLU glu;
     private String archivo;
+    private boolean resultadoICPVisible=true;
 
     /**
      * Constructor to setup the GUI for this Component
@@ -63,6 +65,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         super(capabilities);
         this.addGLEventListener(this);
         valuesB = new ArrayList<>();
+        resultadoICPClasico = new ArrayList<>();
     }
 
     /**
@@ -76,6 +79,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         this.addGLEventListener(this);
         this.archivo = archivo;
         valuesB = new ArrayList<>();
+        resultadoICPClasico = new ArrayList<>();
     }
 
     /**
@@ -84,6 +88,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
     public Canvas() {
         this.addGLEventListener(this);
         valuesB = new ArrayList<>();
+        resultadoICPClasico = new ArrayList<>();
     }
 
     /**
@@ -388,12 +393,12 @@ public class Canvas extends GLCanvas implements GLEventListener {
         try {
             if (archivo == null || archivo.isEmpty()) {
                 values = new Reader(
-                        Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()));
+                        Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()), null);
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/horse.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply"));
             } else {
-                values = new Reader(Paths.get(archivo));
+                values = new Reader(Paths.get(archivo), null);
             }
         } catch (IOException ie) {
             ie.printStackTrace();
@@ -540,65 +545,66 @@ public class Canvas extends GLCanvas implements GLEventListener {
         // Begin triangle rendering
         gl.glBegin(GL_POINTS);
 
-        // Loop over faces, rendering each vertex for each face
-        for (int i = 0; i < values.face_list.length; i++) {
-            // Set the normal for a vertex and then make the vertex
-            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying purpura  
+        if (values != null && values.isVisible()) {
+            // Loop over faces, rendering each vertex for each face
+            for (int i = 0; i < values.face_list.length; i++) {
+                // Set the normal for a vertex and then make the vertex
+                gl.glColor3f(0.5f, 0.0f, 1.0f); //applying purpura  
 //            gl.glNormal3f(values.face_list[i].vertex_list[0].normal.x,
 //                    values.face_list[i].vertex_list[0].normal.y,
 //                    values.face_list[i].vertex_list[0].normal.z);
-            gl.glVertex3f(values.face_list[i].vertex_list[0].x,
-                    values.face_list[i].vertex_list[0].y,
-                    values.face_list[i].vertex_list[0].z);
+                gl.glVertex3f(values.face_list[i].vertex_list[0].x,
+                        values.face_list[i].vertex_list[0].y,
+                        values.face_list[i].vertex_list[0].z);
 
-            // And again
-            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying red  
+                // And again
+                gl.glColor3f(0.5f, 0.0f, 1.0f); //applying red  
 //            gl.glNormal3f(values.face_list[i].vertex_list[1].normal.x,
 //                    values.face_list[i].vertex_list[1].normal.y,
 //                    values.face_list[i].vertex_list[1].normal.z);
-            gl.glVertex3f(values.face_list[i].vertex_list[1].x,
-                    values.face_list[i].vertex_list[1].y,
-                    values.face_list[i].vertex_list[1].z);
+                gl.glVertex3f(values.face_list[i].vertex_list[1].x,
+                        values.face_list[i].vertex_list[1].y,
+                        values.face_list[i].vertex_list[1].z);
 
-            // Third time's the charm
-            gl.glColor3f( 0.5f, 0.0f, 1.0f ); //applying red  
+                // Third time's the charm
+                gl.glColor3f(0.5f, 0.0f, 1.0f); //applying red  
 //            gl.glNormal3f(values.face_list[i].vertex_list[2].normal.x,
 //                    values.face_list[i].vertex_list[2].normal.y,
 //                    values.face_list[i].vertex_list[2].normal.z);
-            gl.glVertex3f(values.face_list[i].vertex_list[2].x,
-                    values.face_list[i].vertex_list[2].y,
-                    values.face_list[i].vertex_list[2].z);
-        }
-
-        float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
-        float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
-        float[] d3f = {0.4f, 0.2f, 0.2f, 1.0f};
-        FloatBuffer d1 = FloatBuffer.wrap(d1f);
-        FloatBuffer d2 = FloatBuffer.wrap(d2f);
-        FloatBuffer d3 = FloatBuffer.wrap(d3f);
-
-        if (values.face_list.length == 0) {
-            for (int i = 0; i < values.vertex_list.length; i++) {
-                gl.glColor3f(1f, 0f, 0f); //applying red  
-                gl.glVertex3f(values.vertex_list[i].x,
-                        values.vertex_list[i].y,
-                        values.vertex_list[i].z);
+                gl.glVertex3f(values.face_list[i].vertex_list[2].x,
+                        values.face_list[i].vertex_list[2].y,
+                        values.face_list[i].vertex_list[2].z);
             }
-        }
 
-        if (valuesB != null && !valuesB.isEmpty()) {
-            for (Reader figura : valuesB) {
-                for (int i = 0; i < figura.vertex_list.length; i++) {
-                    gl.glColor3f(0.0f, 0.99f, 0.0f); //applying red  
-//                    gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d2);
-                    gl.glVertex3f(figura.vertex_list[i].x,
-                            figura.vertex_list[i].y,
-                            figura.vertex_list[i].z);
+            if (values.face_list.length == 0) {
+                for (int i = 0; i < values.vertex_list.length; i++) {
+                    gl.glColor3f(1f, 0f, 0f); //applying red  
+                    gl.glVertex3f(values.vertex_list[i].x,
+                            values.vertex_list[i].y,
+                            values.vertex_list[i].z);
                 }
             }
         }
 
-        if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty()) {
+        float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
+        FloatBuffer d1 = FloatBuffer.wrap(d1f);
+
+        if (valuesB != null && !valuesB.isEmpty()) {
+            for (Reader figura : valuesB) {
+                if (figura.isVisible()) {
+                    FloatBuffer d3U = figura.getColor() == null ? d1 : figura.getColor();
+                    for (int i = 0; i < figura.vertex_list.length; i++) {
+                        gl.glColor3fv(d3U); //applying red  
+//                    gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d2);
+                        gl.glVertex3f(figura.vertex_list[i].x,
+                                figura.vertex_list[i].y,
+                                figura.vertex_list[i].z);
+                    }
+                }
+            }
+        }
+
+        if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty() && resultadoICPVisible) {
 
             for (Point3d point3d : resultadoICPClasico) {
                 gl.glColor3d(1.0f, 1.1f, 0.0f); //applying ?  
@@ -623,32 +629,64 @@ public class Canvas extends GLCanvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
     }
 
-    public void cargarArchivo(String archivo) {
+    /**
+     *
+     * @param archivo
+     */
+    public Reader cargarArchivo(String archivo) {
         try {
-            values = new Reader(Paths.get(archivo));
+            float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
+            float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
+            float[] d3f = {0.4f, 0.2f, 0.2f, 1.0f};
+            FloatBuffer d1 = FloatBuffer.wrap(d1f);
+            FloatBuffer d2 = FloatBuffer.wrap(d2f);
+            FloatBuffer d3 = FloatBuffer.wrap(d3f);
+
+            values = new Reader(Paths.get(archivo), d2);
         } catch (IOException ie) {
             ie.printStackTrace();
         }
 
         gl.glLoadIdentity();
+        return values;
     }
 
-    public void agregarArchivo(String archivo) {
+    /**
+     *
+     * @param archivo
+     */
+    public Reader agregarArchivo(String archivo) {
+        Reader nuevo = null;
         try {
-            Reader nuevo = new Reader(Paths.get(archivo));
+            Random r = new Random();
+            float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
+            float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
+            float[] d3f = {0.4f, 0.2f, r.nextFloat(), 1.0f};
+            FloatBuffer d1 = FloatBuffer.wrap(d1f);
+            FloatBuffer d2 = FloatBuffer.wrap(d2f);
+            FloatBuffer d3 = FloatBuffer.wrap(d3f);
+
+            nuevo = new Reader(Paths.get(archivo), d3);
             valuesB.add(nuevo);
         } catch (IOException ie) {
             ie.printStackTrace();
         }
 
         gl.glLoadIdentity();
+        return nuevo;
     }
 
-    public void limpiar() {
+    /**
+     *
+     */
+    public void limpiar(boolean refresh) {
         values = new Reader();
         valuesB.clear();
+        resultadoICPClasico.clear();
 
-        gl.glLoadIdentity();
+        if (refresh) {
+            gl.glLoadIdentity();
+        }
     }
 
     /**
@@ -672,7 +710,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
                 pointSet2[i][2] = valuesB.get(1).vertex_list[i].z;
             }
 
-            IterativeClosestPoint.setDebugLevel(1);
+            IterativeClosestPoint.setDebugLevel(2);
             Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, listener);
 
             //System.out.println("A: " + matrix4d.toString());
@@ -695,10 +733,35 @@ public class Canvas extends GLCanvas implements GLEventListener {
         }
     }
 
-    // Returns the transformed point of the original point given a transform matrix
+    /**
+     * Returns the transformed point of the original point given a transform
+     * matrix
+     *
+     * @param transformMat
+     * @param originalPoint
+     * @return
+     */
     private static Point3d transformPoint(Matrix4d transformMat, Point3d originalPoint) {
         Point3d tempPoint = new Point3d();
         transformMat.transform(new Point3d(originalPoint.getX(), originalPoint.getY(), originalPoint.getZ()), tempPoint);
         return tempPoint;
+    }
+
+    /**
+     * Refresca pantalla
+     * @param raiz
+     * @param bandera 
+     */
+    public void refrescar(Boolean raiz, boolean bandera, boolean isForICP) {
+        if (!isForICP && raiz == null) {
+            values.setVisible(bandera);
+        }
+        
+        if(isForICP){
+            resultadoICPVisible=bandera;
+        }
+
+        log.info("Refresca");
+        gl.glLoadIdentity();
     }
 }

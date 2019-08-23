@@ -9,14 +9,24 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import javax.swing.AbstractButton;
+import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JProgressBar;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -24,6 +34,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix4d;
 import net.joarchitectus.visor3d.icp.ListenerAvance;
 import net.joarchitectus.visor3d.jogl.Canvas;
+import net.joarchitectus.visor3d.jogl.Reader;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -31,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author josorio
  */
 public class MainJFrame extends javax.swing.JFrame {
-
+    
     private static org.slf4j.Logger log = LoggerFactory.getLogger(MainJFrame.class);
 
     /**
@@ -52,8 +63,11 @@ public class MainJFrame extends javax.swing.JFrame {
      * Target FPS for the animator.
      */
     private static final int FPS = 60;
-
+    
     private FPSAnimator animator;
+    
+    private JCheckBoxList checkBoxList;
+//    private DefaultListModel<JCheckBox> modelCheck;
 
     /**
      * Creates new form MainJFrame
@@ -87,8 +101,17 @@ public class MainJFrame extends javax.swing.JFrame {
                 }.start();
             }
         });
-
+        
         initComponents();
+        
+//        modelCheck = new DefaultListModel<JCheckBox>();
+        checkBoxList = new JCheckBoxList();
+        
+        JoCheckBox inicial = new JoCheckBox("Conejo", null);
+//        inicial.addActionListener(crearActionCheck());
+//        modelCheck.addElement(inicial);
+        
+        scrollXList.setViewportView(checkBoxList);
 
         //this.setTitle(TITLE);
         //this.pack();
@@ -97,6 +120,27 @@ public class MainJFrame extends javax.swing.JFrame {
         // Start animation loop
         animator.start();
     }
+
+//    /**
+//     * Para ocultar o mostrar objetos 3D segun check
+//     *
+//     * @return
+//     */
+//    private ActionListener crearActionCheck() {
+//        return new ActionListener() {
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    JoCheckBox abstractButton = (JoCheckBox) actionEvent.getSource();
+//                    boolean selected = abstractButton.getModel().isSelected();
+//                    log.info("cambio: "+selected);
+//                    Boolean raiz = abstractButton.setObjeto3DVisible(selected);
+//                    ((Canvas) canvas).refrescar(raiz, selected, abstractButton.isForICP());
+//                } catch (Exception ex) {
+//                    log.error("Error", ex);
+//                }
+//            }
+//        };
+//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -111,6 +155,9 @@ public class MainJFrame extends javax.swing.JFrame {
         jToolBar1 = new javax.swing.JToolBar();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
+        scrollXList = new javax.swing.JScrollPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtEstado = new javax.swing.JTextArea();
         barraProgreso = new javax.swing.JProgressBar();
         labelEstado = new javax.swing.JLabel();
         jMenuBarMain = new javax.swing.JMenuBar();
@@ -119,6 +166,9 @@ public class MainJFrame extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        menuBun000 = new javax.swing.JMenuItem();
+        menuBun045 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Visor 3D PLY - Julian A Osorio G");
@@ -134,6 +184,13 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jPanel1.setMinimumSize(new java.awt.Dimension(100, 100));
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
+        jPanel1.add(scrollXList);
+
+        txtEstado.setColumns(20);
+        txtEstado.setRows(5);
+        jScrollPane1.setViewportView(txtEstado);
+
+        jPanel1.add(jScrollPane1);
         jPanel1.add(barraProgreso);
 
         labelEstado.setText("Progreso");
@@ -148,7 +205,7 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         });
 
-        jMenuAbrir.setText("Abrir");
+        jMenuAbrir.setText("Limpiar y Abrir");
         jMenuAbrir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuAbrirActionPerformed(evt);
@@ -182,6 +239,26 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jMenuBarMain.add(jMenu1);
 
+        jMenu2.setText("Bunny");
+
+        menuBun000.setText("Bun000");
+        menuBun000.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuBun000ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuBun000);
+
+        menuBun045.setText("Bun045");
+        menuBun045.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuBun045ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuBun045);
+
+        jMenuBarMain.add(jMenu2);
+
         setJMenuBar(jMenuBarMain);
 
         pack();
@@ -197,17 +274,23 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jMenuAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAbrirActionPerformed
         // TODO add your handling code here:
+        ((Canvas) canvas).limpiar(false);
+//        modelCheck.removeAllElements();
+        
         jFileChooserPyl.setDialogTitle("Select a ply file");
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("PLY file", "ply");
         jFileChooserPyl.addChoosableFileFilter(filter);
-
+        
         int returnValue = jFileChooserPyl.showOpenDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             if (jFileChooserPyl.getSelectedFile().isDirectory()) {
                 System.out.println("You selected the directory: " + jFileChooserPyl.getSelectedFile());
             } else {
-                ((Canvas) canvas).cargarArchivo(jFileChooserPyl.getSelectedFile().getPath());
+                Reader objeto3D = ((Canvas) canvas).cargarArchivo(jFileChooserPyl.getSelectedFile().getPath());
+                JoCheckBox chckObjeto3D = new JoCheckBox(jFileChooserPyl.getSelectedFile().getName(), objeto3D);
+//                chckObjeto3D.addActionListener(crearActionCheck());
+//                modelCheck.addElement(chckObjeto3D);
             }
         }
     }//GEN-LAST:event_jMenuAbrirActionPerformed
@@ -218,25 +301,31 @@ public class MainJFrame extends javax.swing.JFrame {
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("PLY file", "ply");
         jFileChooserPyl.addChoosableFileFilter(filter);
-
+        
         int returnValue = jFileChooserPyl.showOpenDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             if (jFileChooserPyl.getSelectedFile().isDirectory()) {
                 System.out.println("You selected the directory: " + jFileChooserPyl.getSelectedFile());
             } else {
-                ((Canvas) canvas).agregarArchivo(jFileChooserPyl.getSelectedFile().getPath());
+                Reader objeto3D = ((Canvas) canvas).agregarArchivo(jFileChooserPyl.getSelectedFile().getPath());
+                JoCheckBox chckObjeto3D = new JoCheckBox(jFileChooserPyl.getSelectedFile().getName(), objeto3D);
+//                chckObjeto3D.addActionListener(crearActionCheck());
+//                modelCheck.addElement(chckObjeto3D);
             }
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here: Limpiar
-        ((Canvas) canvas).limpiar();
+        ((Canvas) canvas).limpiar(true);
+//        modelCheck.removeAllElements();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO Ejecutar ICP
         log.warn("Ejecutando ICP...");
+        labelEstado.setText("Ejecutando ICP");
+        
         ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
             @Override
             public void avance(String text) {
@@ -244,12 +333,12 @@ public class MainJFrame extends javax.swing.JFrame {
                 labelEstado.revalidate();
                 labelEstado.repaint();
             }
-
+            
             @Override
             public void avance(int iteracion) {
                 
             }
-
+            
             @Override
             public void matrixAvance(Matrix4d matrix4d, int iteracion) {
                 
@@ -258,7 +347,28 @@ public class MainJFrame extends javax.swing.JFrame {
         //start the SwingWorker outside the EDT
 //        MySwingWorker worker = new MySwingWorker(barraProgreso, labelEstado);
 //        worker.execute();
+        JoCheckBox chckObjeto3D = new JoCheckBox("Resultado ICP", null);
+        chckObjeto3D.forICP(true);
+//        chckObjeto3D.addActionListener(crearActionCheck());
+//        modelCheck.addElement(chckObjeto3D);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void menuBun000ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun000ActionPerformed
+        // TODO add your handling code here:
+        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun000.ply").getPath());
+        JoCheckBox chckObjeto3D = new JoCheckBox("bun000", objeto3D);
+//        chckObjeto3D.addActionListener(crearActionCheck());
+//        modelCheck.addElement(chckObjeto3D);
+        this.repaint();
+    }//GEN-LAST:event_menuBun000ActionPerformed
+
+    private void menuBun045ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun045ActionPerformed
+        // TODO add your handling code here:
+        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun045.ply").getPath());
+        JoCheckBox chckObjeto3D = new JoCheckBox("bun045", objeto3D);
+//        chckObjeto3D.addActionListener(crearActionCheck());
+//        modelCheck.addElement(chckObjeto3D);
+    }//GEN-LAST:event_menuBun045ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -315,53 +425,59 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JFileChooser jFileChooserPyl;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuItem jMenuAbrir;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel labelEstado;
+    private javax.swing.JMenuItem menuBun000;
+    private javax.swing.JMenuItem menuBun045;
+    private javax.swing.JScrollPane scrollXList;
+    private javax.swing.JTextArea txtEstado;
     // End of variables declaration//GEN-END:variables
 
     /**
      * Worker
      */
     private class MySwingWorker extends SwingWorker<String, Double> {
-
+        
         private final JProgressBar fProgressBar;
         private final JLabel fLabel;
-
+        
         private MySwingWorker(JProgressBar aProgressBar, JLabel aLabel) {
             fProgressBar = aProgressBar;
             fLabel = aLabel;
         }
-
+        
         @Override
         protected String doInBackground() throws Exception {
-
+            
             ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
                 @Override
                 public void avance(String text) {
-
+                    
                 }
-
+                
                 @Override
                 public void avance(int iteracion) {
                     //log.info("IT: " + iteracion);
                     publish(new Double(iteracion));
                 }
-
+                
                 @Override
                 public void matrixAvance(Matrix4d matrix4d, int iteracion) {
-
+                    
                 }
-
+                
             });
             return "Finished";
         }
-
+        
         @Override
         protected void process(List<Double> aDoubles) {
             //log.info("IT_B: " + aDoubles);
@@ -369,7 +485,7 @@ public class MainJFrame extends javax.swing.JFrame {
             int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
             fProgressBar.setValue((int) (fProgressBar.getMinimum() + (amount * aDoubles.get(aDoubles.size() - 1))));
         }
-
+        
         @Override
         protected void done() {
             try {
@@ -379,5 +495,5 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         }
     }
-
+    
 }

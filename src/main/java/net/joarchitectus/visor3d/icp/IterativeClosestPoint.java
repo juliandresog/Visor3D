@@ -18,7 +18,8 @@ import org.apache.commons.math3.random.*;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Iterative Closest Point implementation based on this paper:
+ * http://eecs.vanderbilt.edu/courses/CS359/other_links/papers/1992_besl_mckay_ICP.pdf
  */
 public class IterativeClosestPoint {
 
