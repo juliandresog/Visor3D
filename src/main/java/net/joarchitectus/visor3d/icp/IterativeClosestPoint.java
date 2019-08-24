@@ -5,7 +5,12 @@
  */
 package net.joarchitectus.visor3d.icp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import javax.vecmath.Matrix4d;
@@ -13,6 +18,7 @@ import javax.vecmath.Point3d;
 import net.joarchitectus.visor3d.jogl.Canvas;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.random.*;
 import org.slf4j.LoggerFactory;
@@ -24,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class IterativeClosestPoint {
 
     private static int debugLevel = 0;
+    private static boolean with_KD_Tree = false;
     private static org.slf4j.Logger log = LoggerFactory.getLogger(IterativeClosestPoint.class);
 
     /**
@@ -36,15 +43,27 @@ public class IterativeClosestPoint {
     }
 
     /**
+     * Si para buscar la correspondencia del punto mas cercano vamos a usar K-D
+     * Tree
+     *
+     * @param with_KD_Tree
+     */
+    public static void setWith_KD_Tree(boolean with_KD_Tree) {
+        IterativeClosestPoint.with_KD_Tree = with_KD_Tree;
+    }
+
+    /**
      * Calculate the transform (rotation and translation) between two 3D point
-     * sets. Starts with an initial identity transform. Resulting transform
+     * sets.Starts with an initial identity transform.Resulting transform
      * moves pointSet2 to pointSet1.
      *
      * @param pointSet1
      * @param pointSet2
+     * @param listenerAvance
      * @return
+     * @throws java.lang.Exception
      */
-    public static Matrix4d calcTransform(double[][] pointSet1, double[][] pointSet2, ListenerAvance listenerAvance) {
+    public static Matrix4d calcTransform(double[][] pointSet1, double[][] pointSet2, ListenerAvance listenerAvance) throws Exception {
         if (debugLevel > 0) {
             log.warn("[ICP::calcTransform] no init transform");
         }
@@ -55,15 +74,16 @@ public class IterativeClosestPoint {
 
     /**
      * Calculate the transform (rotation and translation) between two 3D point
-     * sets with an initial transform guess. Resulting transform moves pointSet2
+     * sets with an initial transform guess.Resulting transform moves pointSet2
      * to pointSet1.
      *
      * @param pointSet1
      * @param pointSet2
      * @param initTransform
      * @return
+     * @throws java.lang.Exception
      */
-    public static Matrix4d calcTransform(double[][] pointSet1, double[][] pointSet2, Matrix4d initTransform, ListenerAvance listenerAvance) {
+    public static Matrix4d calcTransform(double[][] pointSet1, double[][] pointSet2, Matrix4d initTransform, ListenerAvance listenerAvance) throws Exception {
         if (debugLevel > 0) {
             log.warn("[ICP::calcTransform]");
         }
@@ -71,6 +91,8 @@ public class IterativeClosestPoint {
         //sample pointSet2
         boolean samplePoints = true;
         double[][] localPointSet2;
+        
+        //Se selecciona subconjunto de puntos
         if (samplePoints) {
             int sparsity = 10;
             localPointSet2 = new double[pointSet2.length / sparsity][];
@@ -80,6 +102,8 @@ public class IterativeClosestPoint {
         } else {
             localPointSet2 = pointSet2;
         }
+        
+        //Inicializacion de variables
         //results (and also initial estimate)
         TreeMap<Double, Matrix4d> results = new TreeMap<Double, Matrix4d>();
         Matrix4d transform = new Matrix4d(initTransform);
@@ -100,14 +124,44 @@ public class IterativeClosestPoint {
         //apply initial rotation and translation to localPointSet2
         transformPoints(transform, localPointSet2, transformedPointSet2);
 
+        KdTree kdTree = null;
+//        WekaNearestNeighbourSearch knn = null;
+
+        //Si se decesa usar algun algoritmo para vecinos cercanos
+        if (with_KD_Tree) {
+            List<KdTree.XYZPoint> list = new ArrayList<>();
+            for (double[] p1 : pointSet1) {
+                KdTree.XYZPoint point = new KdTree.XYZPoint(p1[0], p1[1], p1[2]);
+                list.add(point);
+            }
+            kdTree = new KdTree(list);
+        }
+//        if (with_KD_Tree) {
+//            List<Point3d> points = new ArrayList<>();
+//            for (double[] p1 : pointSet1) {
+//                Point3d point = new Point3d(p1[0], p1[1], p1[2]);
+//                points.add(point);
+//            }
+//            knn = new WekaNearestNeighbourSearch(points);
+//        }
+
+        //Se itera hasta encontrar el minimo error
         int count = 0;
         while (errorImprovement > errorImprovementThreshold) {
-            matchedPointSet1 = getClosestPoints(pointSet1, transformedPointSet2);
+            //Buscando correspondencia con puntos cercanos
+            //encontrar el punto más cercano de dj en el conjunto M
+            if (with_KD_Tree) {
+                matchedPointSet1 = getClosestPointsKDTree(kdTree, transformedPointSet2);
+//                matchedPointSet1 = getClosestPointsKNN(knn, transformedPointSet2);
+            } else {
+                matchedPointSet1 = getClosestPoints(pointSet1, transformedPointSet2);
+            }
 
             //should this use pointSet1 and pointSet2?
             double[] mu1 = getExpectedValue(matchedPointSet1);
             double[] mu2 = getExpectedValue(transformedPointSet2);
 
+            //Calcular la transformación (R,t) que minimiza la función de coste
             double[][] covarianceMatrix = getCovarianceMatrix(matchedPointSet1, transformedPointSet2, mu1, mu2);
             double[][] q = getQ(covarianceMatrix);
             double[] eigenVector = getMaxEigenVector(q);
@@ -122,9 +176,12 @@ public class IterativeClosestPoint {
             transform.mul(tempTransform, transform);
 
             //apply rotation and translation to localPointSet2
+            //Actualizar el conjunto de datos D, aplicándole esta transformación
             transformPoints(transform, localPointSet2, transformedPointSet2);
 
             //calculate error
+            //Calcular la diferencia del error cuadrático:
+            //ei = || Ei-1(R,t) - Ei(R,t) ||
             currError = calculateError(matchedPointSet1, transformedPointSet2);
             errorImprovement = lastError - currError;
             lastError = currError;
@@ -138,6 +195,7 @@ public class IterativeClosestPoint {
                 log.warn("Trans Vector: ");
                 log.warn(Arrays.toString(translationalVector));
             }
+            //registro info y log
             if (debugLevel > 0) {
                 log.warn("Error: " + currError);
                 log.warn("Error improvement: " + errorImprovement);
@@ -146,8 +204,15 @@ public class IterativeClosestPoint {
                 log.warn("Iteration: " + count++);
 
                 if (listenerAvance != null) {
-                    listenerAvance.avance("Iteration: "+count);
+                    listenerAvance.avance("Iteration: " + count);
                     listenerAvance.avance(count);
+                    
+                    Map registro = new HashMap();
+                    registro.put("iteracion", count);
+                    registro.put("error", currError);
+                    registro.put("muestra_puntos", localPointSet2.length);
+                    
+                    listenerAvance.addHistorico(registro);
                 }
             }
 
@@ -261,6 +326,63 @@ public class IterativeClosestPoint {
         return matches;
     }
 
+    /**
+     * Usando el metodo con KD-Tree
+     *
+     * @param pointSet1
+     * @param pointSet2
+     * @return
+     */
+    private static double[][] getClosestPointsKDTree(KdTree kdTree, double[][] pointSet2) {
+
+        double[][] matches = new double[pointSet2.length][];
+
+        int i = 0;
+        for (double[] p2 : pointSet2) {
+            Collection<KdTree.XYZPoint> cercanos = kdTree.nearestNeighbourSearch(1, new KdTree.XYZPoint(p2[0], p2[1], p2[2]));
+            KdTree.XYZPoint cercano = cercanos.iterator().next();
+            double[] closest = new double[3];
+            closest[0] = cercano.x;
+            closest[1] = cercano.y;
+            closest[2] = cercano.z;
+            matches[i++] = closest;
+        }
+
+        return matches;
+    }
+
+    /**
+     * Usando algormismos de weka para knn
+     *
+     * @param knn
+     * @param pointSet2
+     * @return
+     * @throws Exception
+     */
+    private static double[][] getClosestPointsKNN(WekaNearestNeighbourSearch knn, double[][] pointSet2) throws Exception {
+
+        double[][] matches = new double[pointSet2.length][];
+
+        int i = 0;
+        for (double[] p2 : pointSet2) {
+            Point3d cercano = knn.puntoMasCercano(new Point3d(p2[0], p2[1], p2[2]));
+
+            double[] closest = new double[3];
+            closest[0] = cercano.x;
+            closest[1] = cercano.y;
+            closest[2] = cercano.z;
+            matches[i++] = closest;
+        }
+
+        return matches;
+    }
+
+    /**
+     *
+     * @param p1
+     * @param p2
+     * @return
+     */
     private static double distance(double[] p1, double[] p2) {
         double dist = 0;
         for (int i = 0; i < p1.length; ++i) {
@@ -269,6 +391,11 @@ public class IterativeClosestPoint {
         return Math.sqrt(dist);
     }
 
+    /**
+     *
+     * @param points
+     * @return
+     */
     private static double[] getExpectedValue(double[][] points) {
         double[] expectedVal = {0, 0, 0};
 
@@ -285,6 +412,14 @@ public class IterativeClosestPoint {
         return expectedVal;
     }
 
+    /**
+     *
+     * @param pointSet1
+     * @param pointSet2
+     * @param mu1
+     * @param mu2
+     * @return
+     */
     private static double[][] getCovarianceMatrix(double[][] pointSet1, double[][] pointSet2, double[] mu1, double[] mu2) {
         if (pointSet1.length != pointSet2.length) {
             return null;
@@ -313,6 +448,11 @@ public class IterativeClosestPoint {
         return cov;
     }
 
+    /**
+     *
+     * @param e
+     * @return
+     */
     private static double getTrace(double[][] e) {
         double trace = 0;
         for (int i = 0; i < e.length; i++) {
@@ -322,6 +462,11 @@ public class IterativeClosestPoint {
         return trace;
     }
 
+    /**
+     *
+     * @param e
+     * @return
+     */
     private static double[][] getQ(double[][] e) {
         if (debugLevel > 1) {
             log.warn("E: ");
@@ -352,6 +497,11 @@ public class IterativeClosestPoint {
         return q;
     }
 
+    /**
+     *
+     * @param q
+     * @return
+     */
     private static double[] getMaxEigenVector(double[][] q) {
         if (debugLevel > 1) {
             log.warn("Q: ");
@@ -365,7 +515,31 @@ public class IterativeClosestPoint {
         EigenDecomposition evd = new EigenDecomposition(Qmat, 0.0);
         return evd.getEigenvector(0).toArray();
     }
+    
+    /**
+     *
+     * @param q
+     * @return
+     */
+    private static double[] getMaxSVDVector(double[][] q) {
+        if (debugLevel > 1) {
+            log.warn("Q: ");
+            for (double[] d : q) {
+                log.warn(Arrays.toString(d));
+            }
+            log.warn("");
+        }
 
+        RealMatrix Qmat = new BlockRealMatrix(q);
+        SingularValueDecomposition svd = new SingularValueDecomposition(Qmat);
+        return svd.getSingularValues();
+    }
+
+    /**
+     *
+     * @param rotationVector
+     * @return
+     */
     private static double[][] getRotationMatrix(double[] rotationVector) {
         double[][] r = new double[3][3];
         double[] rv = rotationVector;
@@ -386,6 +560,13 @@ public class IterativeClosestPoint {
         return r;
     }
 
+    /**
+     *
+     * @param mu1
+     * @param mu2
+     * @param rot
+     * @return
+     */
     private static double[] getTranslationVector(double[] mu1, double[] mu2, double[][] rot) {
         double[] t = new double[3];
 
@@ -396,8 +577,14 @@ public class IterativeClosestPoint {
         return t;
     }
 
-    // Returns a transformation Matrix from given corresponding points such that
-    // oldpoints are transformed to newpoints
+    /**
+     * Returns a transformation Matrix from given corresponding points such that
+     * oldpoints are transformed to newpoints
+     *
+     * @param oldpoints
+     * @param newpoints
+     * @return
+     */
     public static Matrix4d transformMatFromCorrPoints(double[][] oldpoints, double[][] newpoints) {
         Matrix4d tempTransform = new Matrix4d();
         double[] mu1 = getExpectedValue(newpoints);

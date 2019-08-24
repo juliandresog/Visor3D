@@ -67,6 +67,12 @@
         </dependency>
         
         <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.3</version>
+        </dependency>
+        
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
@@ -87,6 +93,7 @@
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${version.log4j}</version>
         </dependency>
+        
  
     </dependencies>
 

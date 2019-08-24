@@ -55,7 +55,7 @@ public class ICPTest {
     // @Test
     // public void hello() {}
     @Test
-    public void ejecutarICP() {
+    public void ejecutarICP() throws Exception {
         log.warn("Iniciado...");
         RandomGenerator randomGenerator = new JDKRandomGenerator();
         randomGenerator.setSeed(100);
@@ -75,6 +75,7 @@ public class ICPTest {
         }
 
         IterativeClosestPoint.setDebugLevel(1);
+        IterativeClosestPoint.setWith_KD_Tree(true);
         Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, null);
 
         System.out.println("A: " + matrix4d.toString());

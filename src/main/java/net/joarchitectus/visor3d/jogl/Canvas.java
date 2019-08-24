@@ -697,7 +697,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
      *
      * @param swingWorker
      */
-    public void ejecutarICP(final ListenerAvance listener) {
+    public void ejecutarICP(final ListenerAvance listener, boolean kd_tree) throws Exception {
         if (valuesB != null && !valuesB.isEmpty() && valuesB.size() == 2) {
             double[][] pointSet1 = new double[valuesB.get(0).vertex_list.length][3];
             double[][] pointSet2 = new double[valuesB.get(1).vertex_list.length][3];
@@ -714,7 +714,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
                 pointSet2[i][2] = valuesB.get(1).vertex_list[i].z;
             }
 
+            //Ejecutamos ICP
             IterativeClosestPoint.setDebugLevel(1);
+            IterativeClosestPoint.setWith_KD_Tree(kd_tree);
             Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, listener);
 
             //System.out.println("A: " + matrix4d.toString());

@@ -18,7 +18,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -37,6 +43,7 @@ import javax.vecmath.Matrix4d;
 import net.joarchitectus.visor3d.icp.ListenerAvance;
 import net.joarchitectus.visor3d.jogl.Canvas;
 import net.joarchitectus.visor3d.jogl.Reader;
+import net.joarchitectus.visor3d.util.CSVUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -44,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * @author josorio
  */
 public class MainJFrame extends javax.swing.JFrame {
-    
+
     private static org.slf4j.Logger log = LoggerFactory.getLogger(MainJFrame.class);
 
     /**
@@ -65,12 +72,15 @@ public class MainJFrame extends javax.swing.JFrame {
      * Target FPS for the animator.
      */
     private static final int FPS = 60;
-    
+
     private FPSAnimator animator;
-    
+
 //    private JCheckBoxList checkBoxList;
 //    private DefaultListModel<JCheckBox> modelCheck;
     private Box boxCheck;
+
+    //Historico ICP
+    private List<Map> historicoICP;
 
     /**
      * Creates new form MainJFrame
@@ -104,19 +114,19 @@ public class MainJFrame extends javax.swing.JFrame {
                 }.start();
             }
         });
-        
+
         initComponents();
         jMenuBarMain.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        
+
         boxCheck = Box.createVerticalBox();
 //        modelCheck = new DefaultListModel<JCheckBox>();
 //        checkBoxList = new JCheckBoxList(modelCheck);
-        
+
         JoCheckBox inicial = new JoCheckBox("Conejo", null);
         inicial.addActionListener(crearActionCheck());
 //        modelCheck.addElement(inicial);
         boxCheck.add(inicial);
-        
+
         scrollXList.setViewportView(boxCheck);
         //scrollXList.add(box);
 
@@ -161,6 +171,8 @@ public class MainJFrame extends javax.swing.JFrame {
         jFileChooserPyl = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         jLabel2 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        cbKDTree = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         scrollXList = new javax.swing.JScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -186,6 +198,14 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jLabel2.setText("Julián Andrés Osorio G.");
         jToolBar1.add(jLabel2);
+        jToolBar1.add(jSeparator1);
+
+        cbKDTree.setFocusable(false);
+        cbKDTree.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        cbKDTree.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        cbKDTree.setLabel("KD-Tree");
+        cbKDTree.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(cbKDTree);
 
         getContentPane().add(jToolBar1, java.awt.BorderLayout.PAGE_START);
 
@@ -286,12 +306,12 @@ public class MainJFrame extends javax.swing.JFrame {
         boxCheck.removeAll();
         boxCheck.doLayout();
         txtEstado.setText("");
-        
+
         jFileChooserPyl.setDialogTitle("Select a ply file");
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("PLY file", "ply");
         jFileChooserPyl.addChoosableFileFilter(filter);
-        
+
         int returnValue = jFileChooserPyl.showOpenDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             if (jFileChooserPyl.getSelectedFile().isDirectory()) {
@@ -312,7 +332,7 @@ public class MainJFrame extends javax.swing.JFrame {
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("PLY file", "ply");
         jFileChooserPyl.addChoosableFileFilter(filter);
-        
+
         int returnValue = jFileChooserPyl.showOpenDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             if (jFileChooserPyl.getSelectedFile().isDirectory()) {
@@ -333,7 +353,7 @@ public class MainJFrame extends javax.swing.JFrame {
         boxCheck.removeAll();
         boxCheck.repaint();
         boxCheck.doLayout();
-        
+
         txtEstado.setText("");
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
@@ -341,7 +361,7 @@ public class MainJFrame extends javax.swing.JFrame {
         // TODO Ejecutar ICP
         log.warn("Ejecutando ICP...");
         labelEstado.setText("Ejecutando ICP");
-        
+
 //        ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
 //            @Override
 //            public void avance(String text) {
@@ -377,8 +397,8 @@ public class MainJFrame extends javax.swing.JFrame {
         chckObjeto3D.addActionListener(crearActionCheck());
         boxCheck.add(chckObjeto3D);
         boxCheck.doLayout();
-        
-        txtEstado.setText(txtEstado.getText()+"\nbun000 tiene "+objeto3D.vertex_len+" puntos");
+
+        txtEstado.setText(txtEstado.getText() + "\nbun000 tiene " + objeto3D.vertex_len + " puntos");
     }//GEN-LAST:event_menuBun000ActionPerformed
 
     private void menuBun045ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun045ActionPerformed
@@ -388,8 +408,8 @@ public class MainJFrame extends javax.swing.JFrame {
         chckObjeto3D.addActionListener(crearActionCheck());
         boxCheck.add(chckObjeto3D);
         boxCheck.doLayout();
-        
-        txtEstado.setText(txtEstado.getText()+"\nbun045 tiene "+objeto3D.vertex_len+" puntos");
+
+        txtEstado.setText(txtEstado.getText() + "\nbun045 tiene " + objeto3D.vertex_len + " puntos");
     }//GEN-LAST:event_menuBun045ActionPerformed
 
     /**
@@ -444,6 +464,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar barraProgreso;
+    private javax.swing.JCheckBox cbKDTree;
     private javax.swing.JFileChooser jFileChooserPyl;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
@@ -455,6 +476,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel labelEstado;
     private javax.swing.JMenuItem menuBun000;
@@ -467,41 +489,48 @@ public class MainJFrame extends javax.swing.JFrame {
      * Worker
      */
     private class MySwingWorker extends SwingWorker<String, Double> {
-        
+
         private final JProgressBar fProgressBar;
         private final JLabel fLabel;
         private long inicio;
-        
+
         private MySwingWorker(JProgressBar aProgressBar, JLabel aLabel) {
             fProgressBar = aProgressBar;
             fLabel = aLabel;
         }
-        
+
         @Override
         protected String doInBackground() throws Exception {
             inicio = System.currentTimeMillis();
-            
+            historicoICP = new ArrayList<>();
+
             ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
                 @Override
                 public void avance(String text) {
                     fLabel.setText(text);
                 }
-                
+
                 @Override
                 public void avance(int iteracion) {
                     //log.info("IT: " + iteracion);
-                    publish(new Double(iteracion/10));
+                    publish(new Double(iteracion) / 10);
                 }
-                
+
                 @Override
                 public void matrixAvance(Matrix4d matrix4d, int iteracion) {
-                    
+
                 }
-                
-            });
+
+                @Override
+                public void addHistorico(Map registro) {
+                    historicoICP.add(registro);
+                }
+
+            }, cbKDTree.isSelected());
+
             return "Finished";
         }
-        
+
         @Override
         protected void process(List<Double> aDoubles) {
             //log.info("IT_B: " + aDoubles);
@@ -509,19 +538,52 @@ public class MainJFrame extends javax.swing.JFrame {
             int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
             fProgressBar.setValue((int) (fProgressBar.getMinimum() + (amount * aDoubles.get(aDoubles.size() - 1))));
         }
-        
+
         @Override
         protected void done() {
             try {
                 fLabel.setText(get());
-                
+
                 long tiempo = (System.currentTimeMillis() - inicio) / 1000;
-                txtEstado.setText(txtEstado.getText()+"\nEl modelo clasico ICP terminó\n"
-                        + "Tiempo: "+tiempo+"seg");
+                txtEstado.setText(txtEstado.getText() + "\nEl modelo ICP terminó\n"
+                        + "Tiempo: " + tiempo + "seg");
+                
+                if (historicoICP != null && !historicoICP.isEmpty()) {
+                    Map ultRegistro = historicoICP.get(historicoICP.size()-1);
+                    txtEstado.setText(txtEstado.getText() + 
+                            "\nIteraciones: "+ultRegistro.get("iteracion")+
+                            "\nUlt error: "+ultRegistro.get("error")+
+                            "\nMuestra puntos: "+ultRegistro.get("muestra_puntos")+
+                            "\n"
+                    );
+                }
+
+                crearCSVHistoricoICP();
             } catch (Exception e) {
                 log.error("Error", e);
             }
         }
     }
-    
+
+    /**
+     * Crear archivo csv con historico de ICP
+     */
+    private void crearCSVHistoricoICP() throws IOException {
+        if (historicoICP != null && !historicoICP.isEmpty()) {
+            String carpetaSalida="";
+            String csvFile = carpetaSalida + "csv_icp_" + new Date().getTime() + ".csv";
+            FileWriter writer = new FileWriter(csvFile);
+            CSVUtils.writeLine(writer, Arrays.asList("Iteracion", "Error", "MuestraPtos"), ',', '"');
+            
+            for (Map map : historicoICP) {
+                CSVUtils.writeLine(writer, Arrays.asList(map.get("iteracion")+"",map.get("error")+"",map.get("muestra_puntos")+""), ',', '"');
+            }
+            
+            writer.flush();
+            writer.close();
+            
+            log.warn("Se crea archivo: {}",csvFile);
+        }
+    }
+
 }

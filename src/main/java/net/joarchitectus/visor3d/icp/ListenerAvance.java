@@ -5,6 +5,7 @@
  */
 package net.joarchitectus.visor3d.icp;
 
+import java.util.Map;
 import javax.vecmath.Matrix4d;
 
 /**
@@ -18,4 +19,6 @@ public interface ListenerAvance {
     public void avance(int iteracion);
     
     public void matrixAvance(Matrix4d matrix4d, int iteracion);
+
+    public void addHistorico(Map registro);
 }
