@@ -8,6 +8,7 @@ package net.joarchitectus.visor3d.jogl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -82,6 +83,27 @@ public class Reader {
         this.color = color;
         PLY objeto3D = PLY.load(path);
 
+        leerPLY(objeto3D);
+    }
+    
+    /**
+     * Usando sjmPLy
+     *
+     * @param path
+     * @throws IOException
+     */
+    public Reader(InputStream inputStream, FloatBuffer color) throws IOException {
+        this.color = color;
+        PLY objeto3D = PLY.read(inputStream);
+
+        leerPLY(objeto3D);
+    }
+    
+    /**
+     * Leer archivo
+     * @param objeto3D 
+     */
+    private void leerPLY(PLY objeto3D){
         PLYElementList vertex = objeto3D.elements("vertex");
         PLYElementList face;
         try {
@@ -134,7 +156,6 @@ public class Reader {
             // This has to be done last so we have all the faces
             vertex_list[i].normal = vertex_list[i].calcNormal();
         }
-
     }
 
     /**

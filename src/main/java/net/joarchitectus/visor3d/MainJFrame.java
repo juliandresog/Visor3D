@@ -392,7 +392,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void menuBun000ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun000ActionPerformed
         // TODO add your handling code here:
-        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun000.ply").getPath());
+        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResourceAsStream("bunny/bun000.ply"));
         JoCheckBox chckObjeto3D = new JoCheckBox("bun000", objeto3D);
         chckObjeto3D.addActionListener(crearActionCheck());
         boxCheck.add(chckObjeto3D);
@@ -403,7 +403,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void menuBun045ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun045ActionPerformed
         // TODO add your handling code here:
-        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun045.ply").getPath());
+        Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResourceAsStream("bunny/bun045.ply"));
         JoCheckBox chckObjeto3D = new JoCheckBox("bun045", objeto3D);
         chckObjeto3D.addActionListener(crearActionCheck());
         boxCheck.add(chckObjeto3D);

@@ -22,6 +22,7 @@ import java.nio.FloatBuffer;
 import static com.jogamp.opengl.GL2.*; // GL2 constants
 import com.jogamp.opengl.GLCapabilities;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -393,7 +394,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
         try {
             if (archivo == null || archivo.isEmpty()) {
                 values = new Reader(
-                        Paths.get(getClass().getClassLoader().getResource("bun_zipper_res3.ply").getPath()), null);
+                        (getClass().getClassLoader().getResourceAsStream("bun_zipper_res3.ply")), null);
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/bunny/reconstruction/bun_zipper.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/horse.ply"));
                 //values = new Reader(Paths.get("/media/DATOS/Universidad/Proyectos/Armadillo_scans/ArmadilloStand_0.ply"));
@@ -671,6 +672,31 @@ public class Canvas extends GLCanvas implements GLEventListener {
             FloatBuffer d3 = FloatBuffer.wrap(d3f);
 
             nuevo = new Reader(Paths.get(archivo), d3);
+            valuesB.add(nuevo);
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }
+
+        gl.glLoadIdentity();
+        return nuevo;
+    }
+    
+    /**
+     *
+     * @param archivo
+     */
+    public Reader agregarArchivo(InputStream inputStream) {
+        Reader nuevo = null;
+        try {
+            Random r = new Random();
+            float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
+            float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
+            float[] d3f = {0.4f, 0.2f, r.nextFloat(), 1.0f};
+            FloatBuffer d1 = FloatBuffer.wrap(d1f);
+            FloatBuffer d2 = FloatBuffer.wrap(d2f);
+            FloatBuffer d3 = FloatBuffer.wrap(d3f);
+
+            nuevo = new Reader(inputStream, d3);
             valuesB.add(nuevo);
         } catch (IOException ie) {
             ie.printStackTrace();
