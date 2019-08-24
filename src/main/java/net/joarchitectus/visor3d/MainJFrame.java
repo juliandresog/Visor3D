@@ -10,6 +10,7 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.AbstractButton;
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -66,8 +68,9 @@ public class MainJFrame extends javax.swing.JFrame {
     
     private FPSAnimator animator;
     
-    private JCheckBoxList checkBoxList;
+//    private JCheckBoxList checkBoxList;
 //    private DefaultListModel<JCheckBox> modelCheck;
+    private Box boxCheck;
 
     /**
      * Creates new form MainJFrame
@@ -103,15 +106,19 @@ public class MainJFrame extends javax.swing.JFrame {
         });
         
         initComponents();
+        jMenuBarMain.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
+        boxCheck = Box.createVerticalBox();
 //        modelCheck = new DefaultListModel<JCheckBox>();
-        checkBoxList = new JCheckBoxList();
+//        checkBoxList = new JCheckBoxList(modelCheck);
         
         JoCheckBox inicial = new JoCheckBox("Conejo", null);
-//        inicial.addActionListener(crearActionCheck());
+        inicial.addActionListener(crearActionCheck());
 //        modelCheck.addElement(inicial);
+        boxCheck.add(inicial);
         
-        scrollXList.setViewportView(checkBoxList);
+        scrollXList.setViewportView(boxCheck);
+        //scrollXList.add(box);
 
         //this.setTitle(TITLE);
         //this.pack();
@@ -121,26 +128,26 @@ public class MainJFrame extends javax.swing.JFrame {
         animator.start();
     }
 
-//    /**
-//     * Para ocultar o mostrar objetos 3D segun check
-//     *
-//     * @return
-//     */
-//    private ActionListener crearActionCheck() {
-//        return new ActionListener() {
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    JoCheckBox abstractButton = (JoCheckBox) actionEvent.getSource();
-//                    boolean selected = abstractButton.getModel().isSelected();
-//                    log.info("cambio: "+selected);
-//                    Boolean raiz = abstractButton.setObjeto3DVisible(selected);
-//                    ((Canvas) canvas).refrescar(raiz, selected, abstractButton.isForICP());
-//                } catch (Exception ex) {
-//                    log.error("Error", ex);
-//                }
-//            }
-//        };
-//    }
+    /**
+     * Para ocultar o mostrar objetos 3D segun check
+     *
+     * @return
+     */
+    private ActionListener crearActionCheck() {
+        return new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    JoCheckBox abstractButton = (JoCheckBox) actionEvent.getSource();
+                    boolean selected = abstractButton.getModel().isSelected();
+                    //log.info("cambio: "+selected);
+                    Boolean raiz = abstractButton.setObjeto3DVisible(selected);
+                    ((Canvas) canvas).refrescar(raiz, selected, abstractButton.isForICP());
+                } catch (Exception ex) {
+                    log.error("Error", ex);
+                }
+            }
+        };
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -188,6 +195,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         txtEstado.setColumns(20);
         txtEstado.setRows(5);
+        txtEstado.setText("Observaciones");
         jScrollPane1.setViewportView(txtEstado);
 
         jPanel1.add(jScrollPane1);
@@ -275,7 +283,8 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jMenuAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAbrirActionPerformed
         // TODO add your handling code here:
         ((Canvas) canvas).limpiar(false);
-//        modelCheck.removeAllElements();
+        boxCheck.removeAll();
+        boxCheck.doLayout();
         
         jFileChooserPyl.setDialogTitle("Select a ply file");
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
@@ -289,8 +298,9 @@ public class MainJFrame extends javax.swing.JFrame {
             } else {
                 Reader objeto3D = ((Canvas) canvas).cargarArchivo(jFileChooserPyl.getSelectedFile().getPath());
                 JoCheckBox chckObjeto3D = new JoCheckBox(jFileChooserPyl.getSelectedFile().getName(), objeto3D);
-//                chckObjeto3D.addActionListener(crearActionCheck());
-//                modelCheck.addElement(chckObjeto3D);
+                chckObjeto3D.addActionListener(crearActionCheck());
+                boxCheck.add(chckObjeto3D);
+                boxCheck.doLayout();
             }
         }
     }//GEN-LAST:event_jMenuAbrirActionPerformed
@@ -309,8 +319,9 @@ public class MainJFrame extends javax.swing.JFrame {
             } else {
                 Reader objeto3D = ((Canvas) canvas).agregarArchivo(jFileChooserPyl.getSelectedFile().getPath());
                 JoCheckBox chckObjeto3D = new JoCheckBox(jFileChooserPyl.getSelectedFile().getName(), objeto3D);
-//                chckObjeto3D.addActionListener(crearActionCheck());
-//                modelCheck.addElement(chckObjeto3D);
+                chckObjeto3D.addActionListener(crearActionCheck());
+                boxCheck.add(chckObjeto3D);
+                boxCheck.doLayout();
             }
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -318,7 +329,9 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here: Limpiar
         ((Canvas) canvas).limpiar(true);
-//        modelCheck.removeAllElements();
+        boxCheck.removeAll();
+        boxCheck.repaint();
+        boxCheck.doLayout();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -326,48 +339,54 @@ public class MainJFrame extends javax.swing.JFrame {
         log.warn("Ejecutando ICP...");
         labelEstado.setText("Ejecutando ICP");
         
-        ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
-            @Override
-            public void avance(String text) {
-                labelEstado.setText(text);
-                labelEstado.revalidate();
-                labelEstado.repaint();
-            }
-            
-            @Override
-            public void avance(int iteracion) {
-                
-            }
-            
-            @Override
-            public void matrixAvance(Matrix4d matrix4d, int iteracion) {
-                
-            }
-        });
+//        ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
+//            @Override
+//            public void avance(String text) {
+//                labelEstado.setText(text);
+//                labelEstado.revalidate();
+//                labelEstado.repaint();
+//            }
+//            
+//            @Override
+//            public void avance(int iteracion) {
+//                
+//            }
+//            
+//            @Override
+//            public void matrixAvance(Matrix4d matrix4d, int iteracion) {
+//                
+//            }
+//        });
         //start the SwingWorker outside the EDT
-//        MySwingWorker worker = new MySwingWorker(barraProgreso, labelEstado);
-//        worker.execute();
+        MySwingWorker worker = new MySwingWorker(barraProgreso, labelEstado);
+        worker.execute();
         JoCheckBox chckObjeto3D = new JoCheckBox("Resultado ICP", null);
         chckObjeto3D.forICP(true);
-//        chckObjeto3D.addActionListener(crearActionCheck());
-//        modelCheck.addElement(chckObjeto3D);
+        chckObjeto3D.addActionListener(crearActionCheck());
+        boxCheck.add(chckObjeto3D);
+        boxCheck.doLayout();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void menuBun000ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun000ActionPerformed
         // TODO add your handling code here:
         Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun000.ply").getPath());
         JoCheckBox chckObjeto3D = new JoCheckBox("bun000", objeto3D);
-//        chckObjeto3D.addActionListener(crearActionCheck());
-//        modelCheck.addElement(chckObjeto3D);
-        this.repaint();
+        chckObjeto3D.addActionListener(crearActionCheck());
+        boxCheck.add(chckObjeto3D);
+        boxCheck.doLayout();
+        
+        txtEstado.setText(txtEstado.getText()+"\nbun000 tiene "+objeto3D.vertex_len+" puntos");
     }//GEN-LAST:event_menuBun000ActionPerformed
 
     private void menuBun045ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuBun045ActionPerformed
         // TODO add your handling code here:
         Reader objeto3D = ((Canvas) canvas).agregarArchivo(getClass().getClassLoader().getResource("bunny/bun045.ply").getPath());
         JoCheckBox chckObjeto3D = new JoCheckBox("bun045", objeto3D);
-//        chckObjeto3D.addActionListener(crearActionCheck());
-//        modelCheck.addElement(chckObjeto3D);
+        chckObjeto3D.addActionListener(crearActionCheck());
+        boxCheck.add(chckObjeto3D);
+        boxCheck.doLayout();
+        
+        txtEstado.setText(txtEstado.getText()+"\nbun045 tiene "+objeto3D.vertex_len+" puntos");
     }//GEN-LAST:event_menuBun045ActionPerformed
 
     /**
@@ -448,6 +467,7 @@ public class MainJFrame extends javax.swing.JFrame {
         
         private final JProgressBar fProgressBar;
         private final JLabel fLabel;
+        private long inicio;
         
         private MySwingWorker(JProgressBar aProgressBar, JLabel aLabel) {
             fProgressBar = aProgressBar;
@@ -456,11 +476,12 @@ public class MainJFrame extends javax.swing.JFrame {
         
         @Override
         protected String doInBackground() throws Exception {
+            inicio = System.currentTimeMillis();
             
             ((Canvas) canvas).ejecutarICP(new ListenerAvance() {
                 @Override
                 public void avance(String text) {
-                    
+                    fLabel.setText(text);
                 }
                 
                 @Override
@@ -490,6 +511,10 @@ public class MainJFrame extends javax.swing.JFrame {
         protected void done() {
             try {
                 fLabel.setText(get());
+                
+                long tiempo = (System.currentTimeMillis() - inicio) / 1000;
+                txtEstado.setText(txtEstado.getText()+"\nEl modelo clasico ICP terminó\n"
+                        + "Tiempo: "+tiempo+"seg");
             } catch (Exception e) {
                 log.error("Error", e);
             }

@@ -15,7 +15,7 @@ import net.joarchitectus.visor3d.jogl.Reader;
  *
  * @author josorio
  */
-public class JoCheckBox extends JCheckBox implements ListCellRenderer {
+public class JoCheckBox extends JCheckBox {//implements ListCellRenderer {
 
     private Reader objeto3D;
     private boolean forICP=false;
@@ -26,6 +26,7 @@ public class JoCheckBox extends JCheckBox implements ListCellRenderer {
      */
     public JoCheckBox(String string, Reader objeto3D) {
         super(string);
+        setSelected(true);
         this.objeto3D = objeto3D;
     }
 
@@ -49,19 +50,19 @@ public class JoCheckBox extends JCheckBox implements ListCellRenderer {
         return forICP;
     }
     
-    public Component getListCellRendererComponent(JList list, Object value, int index, 
-            boolean isSelected, boolean cellHasFocus) {
-
-        setComponentOrientation(list.getComponentOrientation());
-        setFont(list.getFont());
-        setBackground(list.getBackground());
-        setForeground(list.getForeground());
-        setSelected(isSelected);
-        setEnabled(list.isEnabled());
-
-        setText(value == null ? "" : value.toString());  
-
-        return this;
-    }
+//    public Component getListCellRendererComponent(JList list, Object value, int index, 
+//            boolean isSelected, boolean cellHasFocus) {
+//
+//        setComponentOrientation(list.getComponentOrientation());
+//        setFont(list.getFont());
+//        setBackground(list.getBackground());
+//        setForeground(list.getForeground());
+//        setSelected(isSelected);
+//        setEnabled(list.isEnabled());
+//
+//        setText(value == null ? "" : value.toString());  
+//
+//        return this;
+//    }
     
 }

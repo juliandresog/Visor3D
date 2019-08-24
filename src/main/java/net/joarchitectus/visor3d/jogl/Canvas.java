@@ -710,7 +710,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
                 pointSet2[i][2] = valuesB.get(1).vertex_list[i].z;
             }
 
-            IterativeClosestPoint.setDebugLevel(2);
+            IterativeClosestPoint.setDebugLevel(1);
             Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, listener);
 
             //System.out.println("A: " + matrix4d.toString());
