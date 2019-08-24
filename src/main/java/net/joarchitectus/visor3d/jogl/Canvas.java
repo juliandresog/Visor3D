@@ -604,13 +604,17 @@ public class Canvas extends GLCanvas implements GLEventListener {
             }
         }
 
-        if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty() && resultadoICPVisible) {
+        try{
+            if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty() && resultadoICPVisible) {
 
-            for (Point3d point3d : resultadoICPClasico) {
-                gl.glColor3d(1.0f, 1.1f, 0.0f); //applying ?  
-//                gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d1);
-                gl.glVertex3d(point3d.getX(), point3d.getY(), point3d.getZ());
+                for (Point3d point3d : resultadoICPClasico) {
+                    gl.glColor3d(1.0f, 1.1f, 0.0f); //applying ?  
+    //                gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d1);
+                    gl.glVertex3d(point3d.getX(), point3d.getY(), point3d.getZ());
+                }
             }
+        }catch(java.util.ConcurrentModificationException ex){
+            log.warn("Solo si huce archivos externos? "+ex.getMessage()); 
         }
 
         // End rendering

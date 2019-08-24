@@ -285,6 +285,7 @@ public class MainJFrame extends javax.swing.JFrame {
         ((Canvas) canvas).limpiar(false);
         boxCheck.removeAll();
         boxCheck.doLayout();
+        txtEstado.setText("");
         
         jFileChooserPyl.setDialogTitle("Select a ply file");
         jFileChooserPyl.setAcceptAllFileFilterUsed(false);
@@ -332,6 +333,8 @@ public class MainJFrame extends javax.swing.JFrame {
         boxCheck.removeAll();
         boxCheck.repaint();
         boxCheck.doLayout();
+        
+        txtEstado.setText("");
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -487,7 +490,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 @Override
                 public void avance(int iteracion) {
                     //log.info("IT: " + iteracion);
-                    publish(new Double(iteracion));
+                    publish(new Double(iteracion/10));
                 }
                 
                 @Override
