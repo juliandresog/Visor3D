@@ -354,6 +354,8 @@ public class MainJFrame extends javax.swing.JFrame {
                 chckObjeto3D.addActionListener(crearActionCheck());
                 boxCheck.add(chckObjeto3D);
                 boxCheck.doLayout();
+                
+                txtEstado.setText(txtEstado.getText() + "\n"+jFileChooserPyl.getSelectedFile().getName()+" tiene " + objeto3D.vertex_len + " puntos");
             }
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed

@@ -615,7 +615,9 @@ public class Canvas extends GLCanvas implements GLEventListener {
                 }
             }
         }catch(java.util.ConcurrentModificationException ex){
-            log.warn("Solo si huce archivos externos? "+ex.getMessage()); 
+            log.warn("Solo si use archivos externos? "+ex.getMessage()); 
+        }catch(Exception ex){
+            log.warn("Otro? "+ex.getMessage()); 
         }
 
         // End rendering
