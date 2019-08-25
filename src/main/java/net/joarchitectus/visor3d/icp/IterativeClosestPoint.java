@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
 public class IterativeClosestPoint {
 
     private static int debugLevel = 0;
-    private static boolean with_KD_Tree = false;
+    private static boolean with_KD_Tree_java = false;
+    private static boolean with_KD_Tree_weka = false;
     private static org.slf4j.Logger log = LoggerFactory.getLogger(IterativeClosestPoint.class);
 
     /**
@@ -43,14 +44,26 @@ public class IterativeClosestPoint {
     }
 
     /**
-     * Si para buscar la correspondencia del punto mas cercano vamos a usar K-D
-     * Tree
+     * Si para buscar la correspondencia del punto mas cercano vamos a 
+     * usar K-D Tree
      *
-     * @param with_KD_Tree
+     * @param with_KD_Tree_java
      */
-    public static void setWith_KD_Tree(boolean with_KD_Tree) {
-        IterativeClosestPoint.with_KD_Tree = with_KD_Tree;
+    public static void setWith_KD_Tree_java(boolean with_KD_Tree_java) {
+        IterativeClosestPoint.with_KD_Tree_java = with_KD_Tree_java;
     }
+
+    /**
+     * Si para buscar la correspondencia del punto mas cercano vamos a 
+     * usar K-D Tree de la libreria Weka
+     *
+     * @param with_KD_Tree_weka
+     */
+    public static void setWith_KD_Tree_weka(boolean with_KD_Tree_weka) {
+        IterativeClosestPoint.with_KD_Tree_weka = with_KD_Tree_weka;
+    }
+    
+    
 
     /**
      * Calculate the transform (rotation and translation) between two 3D point
@@ -116,6 +129,8 @@ public class IterativeClosestPoint {
         double errorImprovement = Double.MAX_VALUE; //error improvement
         double lastError = Double.MAX_VALUE;
         double currError = Double.MAX_VALUE;
+        double accuracyRequirement = 5e-06;
+        int maxIterations = 50;
         //random restart params
         int maxNumRandomRestarts = 0;
         int numRandomRestarts = 0;
@@ -125,34 +140,35 @@ public class IterativeClosestPoint {
         transformPoints(transform, localPointSet2, transformedPointSet2);
 
         KdTree kdTree = null;
-//        WekaNearestNeighbourSearch knn = null;
+        WekaNearestNeighbourSearch knn = null;
 
         //Si se decesa usar algun algoritmo para vecinos cercanos
-        if (with_KD_Tree) {
+        if (with_KD_Tree_java) {
             List<KdTree.XYZPoint> list = new ArrayList<>();
             for (double[] p1 : pointSet1) {
                 KdTree.XYZPoint point = new KdTree.XYZPoint(p1[0], p1[1], p1[2]);
                 list.add(point);
             }
             kdTree = new KdTree(list);
+        }else if (with_KD_Tree_weka) {
+            List<Point3d> points = new ArrayList<>();
+            for (double[] p1 : pointSet1) {
+                Point3d point = new Point3d(p1[0], p1[1], p1[2]);
+                points.add(point);
+            }
+            knn = new WekaNearestNeighbourSearch(points);
         }
-//        if (with_KD_Tree) {
-//            List<Point3d> points = new ArrayList<>();
-//            for (double[] p1 : pointSet1) {
-//                Point3d point = new Point3d(p1[0], p1[1], p1[2]);
-//                points.add(point);
-//            }
-//            knn = new WekaNearestNeighbourSearch(points);
-//        }
 
         //Se itera hasta encontrar el minimo error
         int count = 0;
-        while (errorImprovement > errorImprovementThreshold) {
+        //while (errorImprovement > errorImprovementThreshold) {
+        while (accuracyRequirement < currError && count < maxIterations) {
             //Buscando correspondencia con puntos cercanos
             //encontrar el punto más cercano de dj en el conjunto M
-            if (with_KD_Tree) {
-                matchedPointSet1 = getClosestPointsKDTree(kdTree, transformedPointSet2);
-//                matchedPointSet1 = getClosestPointsKNN(knn, transformedPointSet2);
+            if (with_KD_Tree_java) {
+                matchedPointSet1 = getClosestPointsKDTree(kdTree, transformedPointSet2);                
+            } else  if (with_KD_Tree_weka) {
+                matchedPointSet1 = getClosestPointsKNN(knn, transformedPointSet2);
             } else {
                 matchedPointSet1 = getClosestPoints(pointSet1, transformedPointSet2);
             }
@@ -195,13 +211,14 @@ public class IterativeClosestPoint {
                 log.warn("Trans Vector: ");
                 log.warn(Arrays.toString(translationalVector));
             }
+            count++;
             //registro info y log
             if (debugLevel > 0) {
                 log.warn("Error: " + currError);
                 log.warn("Error improvement: " + errorImprovement);
                 log.warn("Accum Error: " + currError * localPointSet2.length);
                 log.warn("Number used points: " + localPointSet2.length);
-                log.warn("Iteration: " + count++);
+                log.warn("Iteration: " + count);
 
                 if (listenerAvance != null) {
                     listenerAvance.avance("Iteration: " + count);

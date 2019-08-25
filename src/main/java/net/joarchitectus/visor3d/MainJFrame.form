@@ -4,6 +4,12 @@
   <NonVisualComponents>
     <Component class="javax.swing.JFileChooser" name="jFileChooserPyl">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="buttonGroup2">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="buttonGroup3">
+    </Component>
     <Menu class="javax.swing.JMenuBar" name="jMenuBarMain">
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
@@ -123,10 +129,19 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="cbKDTree">
           <Properties>
+            <Property name="text" type="java.lang.String" value="KD-Tree Java"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="horizontalTextPosition" type="int" value="4"/>
-            <Property name="label" type="java.lang.String" value="KD-Tree"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="cbKDTreeWeka">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="KD-Tree Weka"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalAlignment" type="int" value="4"/>
+            <Property name="horizontalTextPosition" type="int" value="4"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
         </Component>

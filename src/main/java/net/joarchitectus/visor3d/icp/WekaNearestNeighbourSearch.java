@@ -26,19 +26,29 @@ public class WekaNearestNeighbourSearch {
 
     private List<Point3d> points;
     private Instances wekaPoints;
+    private NearestNeighbourSearch search;
 
     /**
      * Puntos
      *
      * @param points
      */
-    public WekaNearestNeighbourSearch(List<Point3d> points) {
+    public WekaNearestNeighbourSearch(List<Point3d> points) throws Exception {
         this.points = points;
 
         //
         // Create the weka datastructure for 3D Points
         //
         wekaPoints = insertIntoWeka(points, "wekaPoints1");
+        
+        //search = new LinearNNSearch();   
+        search = new KDTree();
+        search.setInstances(wekaPoints);
+        
+        EuclideanDistance df = new EuclideanDistance(wekaPoints);
+        df.setDontNormalize(true);
+
+        search.setDistanceFunction(df);
     }
 
     /**
@@ -49,16 +59,7 @@ public class WekaNearestNeighbourSearch {
      */
     public Point3d puntoMasCercano(Point3d punto) throws Exception {
 
-        Instance p = createInstance(punto, wekaPoints);
-
-        //NearestNeighbourSearch search = new LinearNNSearch(wekaPoints);
-        NearestNeighbourSearch search = new KDTree();
-        search.setInstances(wekaPoints);
-
-        EuclideanDistance df = new EuclideanDistance(wekaPoints);
-        df.setDontNormalize(true);
-
-        search.setDistanceFunction(df);
+        Instance p = createInstance(punto, wekaPoints);         
 
         Instances neighbors = search.kNearestNeighbours(p, 1);
         

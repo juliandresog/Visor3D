@@ -169,10 +169,14 @@ public class MainJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jFileChooserPyl = new javax.swing.JFileChooser();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         jToolBar1 = new javax.swing.JToolBar();
         jLabel2 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         cbKDTree = new javax.swing.JCheckBox();
+        cbKDTreeWeka = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         scrollXList = new javax.swing.JScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -200,12 +204,19 @@ public class MainJFrame extends javax.swing.JFrame {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator1);
 
+        cbKDTree.setText("KD-Tree Java");
         cbKDTree.setFocusable(false);
         cbKDTree.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         cbKDTree.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        cbKDTree.setLabel("KD-Tree");
         cbKDTree.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(cbKDTree);
+
+        cbKDTreeWeka.setText("KD-Tree Weka");
+        cbKDTreeWeka.setFocusable(false);
+        cbKDTreeWeka.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        cbKDTreeWeka.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        cbKDTreeWeka.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(cbKDTreeWeka);
 
         getContentPane().add(jToolBar1, java.awt.BorderLayout.PAGE_START);
 
@@ -464,7 +475,11 @@ public class MainJFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar barraProgreso;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox cbKDTree;
+    private javax.swing.JCheckBox cbKDTreeWeka;
     private javax.swing.JFileChooser jFileChooserPyl;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
@@ -526,7 +541,7 @@ public class MainJFrame extends javax.swing.JFrame {
                     historicoICP.add(registro);
                 }
 
-            }, cbKDTree.isSelected());
+            }, cbKDTree.isSelected(), cbKDTreeWeka.isSelected());
 
             return "Finished";
         }
@@ -544,7 +559,7 @@ public class MainJFrame extends javax.swing.JFrame {
             try {
                 fLabel.setText(get());
 
-                long tiempo = (System.currentTimeMillis() - inicio) / 1000;
+                double tiempo = new Double(System.currentTimeMillis() - inicio) / 1000.0;
                 txtEstado.setText(txtEstado.getText() + "\nEl modelo ICP terminó\n"
                         + "Tiempo: " + tiempo + "seg");
                 
@@ -558,7 +573,7 @@ public class MainJFrame extends javax.swing.JFrame {
                     );
                 }
 
-                crearCSVHistoricoICP();
+                //crearCSVHistoricoICP();
             } catch (Exception e) {
                 log.error("Error", e);
             }

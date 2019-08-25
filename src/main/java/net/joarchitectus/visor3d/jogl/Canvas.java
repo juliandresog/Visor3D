@@ -609,7 +609,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
             if (resultadoICPClasico != null && !resultadoICPClasico.isEmpty() && resultadoICPVisible) {
 
                 for (Point3d point3d : resultadoICPClasico) {
-                    gl.glColor3d(1.0f, 1.1f, 0.0f); //applying ?  
+                    gl.glColor3d(1.0f, 1.1f, 0.0f); //applying amarillo?  
     //                gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, d1);
                     gl.glVertex3d(point3d.getX(), point3d.getY(), point3d.getZ());
                 }
@@ -691,7 +691,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
             Random r = new Random();
             float[] d1f = {0.2f, 0.5f, 0.8f, 1.0f};
             float[] d2f = {0.3f, 0.5f, 0.6f, 1.0f};
-            float[] d3f = {0.4f, 0.2f, r.nextFloat(), 1.0f};
+            float[] d3f = {r.nextFloat(), 0.2f, r.nextFloat(), 1.0f};
             FloatBuffer d1 = FloatBuffer.wrap(d1f);
             FloatBuffer d2 = FloatBuffer.wrap(d2f);
             FloatBuffer d3 = FloatBuffer.wrap(d3f);
@@ -723,7 +723,7 @@ public class Canvas extends GLCanvas implements GLEventListener {
      *
      * @param swingWorker
      */
-    public void ejecutarICP(final ListenerAvance listener, boolean kd_tree) throws Exception {
+    public void ejecutarICP(final ListenerAvance listener, boolean kd_tree, boolean kd_tree_weka) throws Exception {
         if (valuesB != null && !valuesB.isEmpty() && valuesB.size() == 2) {
             double[][] pointSet1 = new double[valuesB.get(0).vertex_list.length][3];
             double[][] pointSet2 = new double[valuesB.get(1).vertex_list.length][3];
@@ -742,7 +742,8 @@ public class Canvas extends GLCanvas implements GLEventListener {
 
             //Ejecutamos ICP
             IterativeClosestPoint.setDebugLevel(1);
-            IterativeClosestPoint.setWith_KD_Tree(kd_tree);
+            IterativeClosestPoint.setWith_KD_Tree_java(kd_tree);
+            IterativeClosestPoint.setWith_KD_Tree_weka(kd_tree_weka);
             Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, listener);
 
             //System.out.println("A: " + matrix4d.toString());

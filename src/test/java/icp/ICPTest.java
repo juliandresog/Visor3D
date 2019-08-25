@@ -75,7 +75,7 @@ public class ICPTest {
         }
 
         IterativeClosestPoint.setDebugLevel(1);
-        IterativeClosestPoint.setWith_KD_Tree(true);
+        IterativeClosestPoint.setWith_KD_Tree_java(true);
         Matrix4d matrix4d = IterativeClosestPoint.calcTransform(pointSet1, pointSet2, null);
 
         System.out.println("A: " + matrix4d.toString());
