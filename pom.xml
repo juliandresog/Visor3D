@@ -13,7 +13,7 @@
         <lwjgl.version>3.2.1</lwjgl.version>
         <lwjgl.natives>natives-linux</lwjgl.natives>
         <version.slf4j>1.7.25</version.slf4j>
-        <version.log4j>2.9.0</version.log4j>
+        <version.log4j>2.15.0</version.log4j>
     </properties>
     
     <dependencies>
